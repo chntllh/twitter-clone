@@ -1,16 +1,14 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
 export default function SidebarNavigationButton({ destination, text, icon }) {
   return (
     <NavLink
       to={destination}
-      className={({ isActive }) =>
-        isActive && 'text-blue-500'
-      }
+      className={({isActive}) => isActive ? "text-blue-500" : ""}
     >
-      <div className='flex items-center text-center justify-start gap-5 p-2 w-fit hover:bg-neutral-900 hover:rounded-full hover:cursor-pointer'>
-        <div className='text-2xl ml-1'>{icon}</div>
-        <span className='hidden text-2xl lg:block'>{text}</span>
+      <div className="flex items-center text-center justify-start gap-5 p-2 w-fit hover:bg-neutral-900 hover:rounded-full hover:cursor-pointer">
+        <div className="text-2xl ml-1">{icon}</div>
+        <span className="hidden text-2xl lg:block">{text}</span>
       </div>
     </NavLink>
   );

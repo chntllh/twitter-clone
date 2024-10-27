@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import SidebarNavigationButton from '../components/SidebarNavigationButton.jsx';
-import Logo from '../components/Logo.jsx';
 import { BiBell, BiHome, BiSearch, BiSolidCog, BiUser } from 'react-icons/bi';
+import {FaXTwitter} from 'react-icons/fa6'
 import ProfileCard from '../components/ProfileCard.jsx';
 
 export default function Sidebar() {
@@ -9,7 +9,7 @@ export default function Sidebar() {
     <div className='sticky top-0 hidden md:block'>
       <div className='flex flex-col w-12 lg:w-[90%] gap-2'>
         <div className='ml-2'>
-          <Logo />
+          <FaXTwitter size={32} />
         </div>
 
         <SidebarNavigationButton

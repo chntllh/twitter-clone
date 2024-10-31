@@ -1,8 +1,8 @@
 import { NavLink } from "react-router-dom";
-import SidebarNavigationButton from "./SidebarNavigationButton.jsx";
+import SidebarNavigationButton from "../ui/SidebarNavigationButton.jsx";
 import { BiBell, BiHome, BiSearch, BiSolidCog, BiUser } from "react-icons/bi";
 import { FaXTwitter } from "react-icons/fa6";
-import ProfileCard from "./ProfileCard.jsx";
+import ProfileCard from "../ui/ProfileCard.jsx";
 
 const Sidebar = () => {
   return (

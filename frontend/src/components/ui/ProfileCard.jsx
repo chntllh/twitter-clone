@@ -1,8 +1,8 @@
 const ProfileCard = ({username, handleName, pfpUrl}) => {
   return (
-    <div className='flex flex-row justify-start items-center gap-[17px] cursor-pointer hover:bg-neutral-900 hover:rounded-full mx-auto lg:p-[8px] mt-6'>
+    <div className='gap-3 lg:ml-3 flex flex-row justify-start items-center cursor-pointer hover:bg-neutral-900 hover:rounded-full'>
       <img
-        className='w-10 h-10 rounded-full object-cover'
+        className='w-10 lg:w-12 h-10 lg:h-12 rounded-full object-cover'
         src={pfpUrl}
         alt={handleName}
       />

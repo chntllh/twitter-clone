@@ -6,10 +6,11 @@ import ProfileCard from "./ProfileCard.jsx";
 
 const Sidebar = () => {
   return (
-    <div className="sticky top-0 hidden md:block">
-      <div className="flex flex-col w-12 lg:w-[90%] gap-2">
-        <div className="ml-2">
-          <FaXTwitter size={32} />
+    <div className="sticky top-0 hidden md:block h-screen">
+      <div className="flex flex-col h-full lg:w-[90%] gap-2 items-center lg:items-start">
+        <div className="ml-1 lg:ml-2 mt-6 lg:mt-4">
+          <FaXTwitter className="hidden lg:block" size={48} />
+          <FaXTwitter className="block lg:hidden" size={32} />
         </div>
 
         <SidebarNavigationButton
@@ -38,11 +39,13 @@ const Sidebar = () => {
           icon={<BiSolidCog />}
         />
 
-        <ProfileCard
-          username="warko"
-          handleName="Randy Orton"
-          pfpUrl="https://e1.pxfuel.com/desktop-wallpaper/708/299/desktop-wallpaper-wwe-randy-orton-weneedfun-randy-orton-2019-thumbnail.jpg"
-        />
+        <div className="mt-auto mb-6 lg:mb-12">
+          <ProfileCard
+            username="warko"
+            handleName="Randy Orton"
+            pfpUrl="https://e1.pxfuel.com/desktop-wallpaper/708/299/desktop-wallpaper-wwe-randy-orton-weneedfun-randy-orton-2019-thumbnail.jpg"
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-export default function Explore() {
-  return (
-    <div>Explore</div>
-  )
-}
+const Explore = () => {
+  return <div>Explore</div>;
+};
+
+export default Explore;

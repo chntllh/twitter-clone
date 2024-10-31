@@ -1,4 +1,4 @@
-export default function ProfileCard({username, handleName, pfpUrl}) {
+const ProfileCard = ({username, handleName, pfpUrl}) => {
   return (
     <div className='flex flex-row justify-start items-center gap-[17px] cursor-pointer hover:bg-neutral-900 hover:rounded-full mx-auto lg:p-[8px] mt-6'>
       <img
@@ -13,3 +13,5 @@ export default function ProfileCard({username, handleName, pfpUrl}) {
     </div>
   );
 }
+
+export default ProfileCard;

@@ -6,20 +6,19 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 import ErrorPage from "../pages/ErrorPage";
 import PageNotFound from "../pages/PageNotFound";
 
+/* eslint-disable react-refresh/only-export-components */
 const Home = lazy(() => import("../pages/Home"));
 const Explore = lazy(() => import("../pages/Explore"));
 const Notifications = lazy(() => import("../pages/Notifications"));
 const Profile = lazy(() => import("../pages/Profile"));
 const Settings = lazy(() => import("../pages/Settings"));
+const SignIn = lazy(() => import("../pages/SignIn"));
+/* eslint-enable react-refresh/only-export-components */
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <Suspense fallback={<LoadingSpinner />}>
-        <Layout />
-      </Suspense>
-    ),
+    element: <Layout />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -45,8 +44,20 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "/signin",
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <SignIn />
+      </Suspense>
+    ),
+  },
+  {
     path: "*",
-    element: <PageNotFound />,
+    element: (
+      <Suspense fallback={<LoadingSpinner />}>
+        <PageNotFound />
+      </Suspense>
+    ),
   },
 ]);
 

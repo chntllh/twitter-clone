@@ -2,7 +2,7 @@ import bcryptjs from "bcryptjs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../middleware/errorHandler";
-import User from "../models/user.model";
+import User, { InterfaceUser } from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
 
 export const test = (req: Request, res: Response) => {
@@ -32,8 +32,8 @@ export const register = async (
     return next(errorHandler(400, "Invalid email format"));
   }
 
-  const randomSuffix = crypto.randomBytes(3).toString("hex"); // Generates a 6-character random string
-  const username = `${name.split(" ")[0].toLowerCase()}${randomSuffix}`; // Take the first part of the name and add the suffix
+  const randomSuffix = crypto.randomBytes(3).toString("hex");
+  const username = `${name.split(" ")[0].toLowerCase()}${randomSuffix}`;
 
   const hashedPassword: string = bcryptjs.hashSync(password, 10);
 
@@ -99,6 +99,59 @@ export const login = async (
         httpOnly: true,
       })
       .json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const google = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, name, googlePhotoUrl } = req.body;
+
+  try {
+    if (!process.env.JWT_SECRET) {
+      return next(errorHandler(500, "Internal server error"));
+    }
+
+    const user = await User.findOne({ email });
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { passwordHash, ...rest } = user.toObject();
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
+    } else {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+      const randomSuffix = crypto.randomBytes(3).toString("hex");
+      const username = `${name.split(" ")[0].toLowerCase()}${randomSuffix}`;
+
+      const newUser = new User({
+        username: username,
+        displayName: name,
+        passwordHash: hashedPassword,
+        email: email,
+        avatarUrl: googlePhotoUrl,
+      });
+
+      await newUser.save();
+
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+
+      const { passwordHash, ...rest } = newUser.toObject();
+
+      res
+        .status(200)
+        .cookie("access_token", token, { httpOnly: true })
+        .json(rest);
+    }
   } catch (error) {
     next(error);
   }

@@ -5,6 +5,7 @@ import Layout from "../layout/Layout";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import ErrorPage from "../pages/ErrorPage";
 import PageNotFound from "../pages/PageNotFound";
+import ProtectedRoutes from "./ProtectedRoutes.jsx";
 
 /* eslint-disable react-refresh/only-export-components */
 const Home = lazy(() => import("../pages/Home"));
@@ -22,24 +23,29 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "explore",
-        element: <Explore />,
-      },
-      {
-        path: "notifications",
-        element: <Notifications />,
-      },
-      {
-        path: "profile",
-        element: <Profile />,
-      },
-      {
-        path: "settings",
-        element: <Settings />,
+        element: <ProtectedRoutes />,
+        children: [
+          {
+            index: true,
+            element: <Home />,
+          },
+          {
+            path: "explore",
+            element: <Explore />,
+          },
+          {
+            path: "notifications",
+            element: <Notifications />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
+          },
+          {
+            path: "settings",
+            element: <Settings />,
+          },
+        ],
       },
     ],
   },

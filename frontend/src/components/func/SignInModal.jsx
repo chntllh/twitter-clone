@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import Modal from "../ui/Modal";
 import FloatingLabelInput from "../ui/FloatingLabelInput";
+import OAuth from "./OAuth.jsx";
 
 const SignInModal = ({ isOpen, onClose, onSignUpOpen }) => {
   const [isEmailEntered, setIsEmailEntered] = useState(false);
@@ -35,10 +35,7 @@ const SignInModal = ({ isOpen, onClose, onSignUpOpen }) => {
           <div className="w-[20rem]">
             <h1 className="text-4xl font-bold mb-8">Sign in to Twixxer</h1>
 
-            <button className="w-full px-5 py-2 mb-4 flex items-center justify-center gap-1 bg-white hover:bg-gray-200 text-gray-800 font-bold rounded-full">
-              <FcGoogle size={24} />
-              <span>Sign in with Google</span>
-            </button>
+            <OAuth />
 
             <div className="flex items-center gap-4 w-full mb-4">
               <hr className="flex-grow border-gray-600" />

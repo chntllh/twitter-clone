@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { FaXTwitter } from "react-icons/fa6";
-import { FcGoogle } from "react-icons/fc";
 import SignInModal from "../components/func/SignInModal";
 import SignUpModal from "../components/func/SignUpModal";
+import OAuth from "../components/func/OAuth.jsx";
 
 const SignIn = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -41,10 +41,7 @@ const SignIn = () => {
         <h2 className="text-4xl mb-4 font-bold">Join today</h2>
 
         <div className="w-[20rem]">
-          <button className="w-full px-5 py-2 mb-4 flex items-center justify-center gap-1 bg-white hover:bg-gray-200 text-gray-800 font-bold rounded-full">
-            <FcGoogle size={24} />
-            <span>Sign up with Google</span>
-          </button>
+          <OAuth />
 
           <div className="flex items-center gap-4 w-full mb-4">
             <hr className="flex-grow border-gray-600" />

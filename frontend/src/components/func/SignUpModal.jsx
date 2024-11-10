@@ -1,56 +1,75 @@
-import { useEffect, useState } from "react";
-import { FcGoogle } from "react-icons/fc";
 import Modal from "../ui/Modal";
 import FloatingLabelInput from "../ui/FloatingLabelInput";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { useDispatch } from "react-redux";
+import {
+  signUpFailure,
+  signUpStart,
+  signUpSuccess,
+} from "../../redux/user/userSlice.js";
+import { useNavigate } from "react-router-dom";
 
-const SignUpModal = ({ isOpen, onClose, onSignInOpen, isCreateAccount }) => {
-  const [isCreateAccountOpen, setIsCreateAccountOpen] = useState(isCreateAccount);
-  const [name, setName] = useState("")
-  const [username, setUsername] = useState("")
+const SignUpModal = ({ isOpen, onClose }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    setIsCreateAccountOpen(isCreateAccount)
-    setName("")
-    setUsername("")
-  }, [isOpen, isCreateAccount])
+  const [isInfoEntered, setIsInfoEntered] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordFieldType, setPasswordFieldType] = useState("password");
 
-  const handleCreateAccount = () => {
-    setIsCreateAccountOpen(true);
+  const handleCloseModal = () => {
+    setIsInfoEntered(false);
+    setName("");
+    setEmail("");
+    setPassword("");
+    onClose();
+  };
+
+  const handlePasswordShowToggle = () => {
+    passwordFieldType === "password"
+      ? setPasswordFieldType("text")
+      : setPasswordFieldType("password");
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !password) {
+      return dispatch(signUpFailure("Please fill all the fields"));
+    }
+
+    try {
+      dispatch(signUpStart());
+
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email,
+          name: name,
+          password: password,
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signUpFailure(data.message));
+      }
+      if (res.ok) {
+        dispatch(signUpSuccess(data.body));
+        navigate("/");
+      }
+    } catch (error) {
+      dispatch(signUpFailure(error));
+    }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleCloseModal}>
       <div className="flex flex-col items-center">
-        {!isCreateAccountOpen ? (
-          <div className="w-[20rem]">
-            <h1 className="text-4xl font-bold mb-8">Join Twixxer today</h1>
-
-            <button className="w-full px-5 py-2 mb-4 flex items-center justify-center gap-1 bg-white hover:bg-gray-200 text-gray-800 font-bold rounded-full">
-              <FcGoogle size={24} />
-              <span>Sign up with Google</span>
-            </button>
-
-            <div className="flex items-center gap-4 w-full mb-4">
-              <hr className="flex-grow border-gray-600" />
-              <span className="text-gray-300 font-medium">or</span>
-              <hr className="flex-grow border-gray-600" />
-            </div>
-
-            <button
-              onClick={handleCreateAccount}
-              className="w-full px-5 py-2 bg-white text-gray-800 font-bold rounded-full mb-16"
-            >
-              Create account
-            </button>
-
-            <p>
-              Have an account already?{" "}
-              <button className="text-blue-500" onClick={onSignInOpen}>
-                Sign In
-              </button>
-            </p>
-          </div>
-        ) : (
+        {!isInfoEntered ? (
           <div className="w-[30rem]">
             <h1 className="text-4xl font-bold mb-8">Create your account</h1>
             <div className="mb-8">
@@ -63,19 +82,54 @@ const SignUpModal = ({ isOpen, onClose, onSignInOpen, isCreateAccount }) => {
             </div>
             <div className="mb-8">
               <FloatingLabelInput
-                label="Username"
+                label="Email"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="mb-16">
-            <button
-              className="w-full px-5 py-2 bg-white text-gray-800 font-bold rounded-full"
-            >
-              Log in
-            </button>
+              <button
+                className={`w-full px-5 py-2 ${
+                  !name || !email ? "bg-gray-400" : "bg-white"
+                } text-gray-800 font-bold rounded-full`}
+                disabled={!name || !email}
+                onClick={() => setIsInfoEntered(true)}
+              >
+                Log in
+              </button>
             </div>
+          </div>
+        ) : (
+          <div className="w-[30rem]">
+            <h1 className="text-4xl font-bold mb-8">Set a password</h1>
+            <div className="mb-8 flex relative items-center">
+              <FloatingLabelInput
+                label="Password"
+                type={passwordFieldType}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <span
+                className="absolute right-3 cursor-pointer"
+                onClick={handlePasswordShowToggle}
+              >
+                {passwordFieldType === "password" ? (
+                  <AiOutlineEye size={20} />
+                ) : (
+                  <AiOutlineEyeInvisible size={20} />
+                )}
+              </span>
+            </div>
+            <button
+              onClick={handleSignup}
+              className={`w-full px-5 py-2 ${
+                !password ? "bg-gray-400" : "bg-white"
+              } text-gray-800 font-bold rounded-full`}
+              disabled={!password}
+            >
+              Sign Up
+            </button>
           </div>
         )}
       </div>

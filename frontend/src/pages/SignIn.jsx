@@ -7,7 +7,6 @@ import OAuth from "../components/func/OAuth.jsx";
 const SignIn = () => {
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isSignUpOpen, setIsSignUpOpen] = useState(false);
-  const [isCreateAccount, setIsCreateAccount] = useState(false);
 
   const openSignIn = () => {
     setIsSignInOpen(true);
@@ -19,16 +18,9 @@ const SignIn = () => {
     setIsSignUpOpen(true);
   };
 
-  const openCreateAccount = () => {
-    setIsSignInOpen(false);
-    setIsSignUpOpen(true);
-    setIsCreateAccount(true);
-  };
-
   const closeModals = () => {
     setIsSignInOpen(false);
     setIsSignUpOpen(false);
-    setIsCreateAccount(false);
   };
 
   return (
@@ -51,7 +43,7 @@ const SignIn = () => {
 
           <button
             className="w-full px-5 py-2 mb-8 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full"
-            onClick={openCreateAccount}
+            onClick={openSignUp}
           >
             Create account
           </button>
@@ -75,8 +67,6 @@ const SignIn = () => {
       <SignUpModal
         isOpen={isSignUpOpen}
         onClose={closeModals}
-        onSignInOpen={openSignIn}
-        isCreateAccount={isCreateAccount}
       />
     </div>
   );

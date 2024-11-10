@@ -45,8 +45,23 @@ export const register = async (
   });
 
   try {
+    if (!process.env.JWT_SECRET) {
+      return next(errorHandler(500, "Internal server error"));
+    }
+
     await newUser.save();
-    res.status(200).json({ message: "Signup successful" });
+
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+
+    const userData = newUser.toObject();
+    const { passwordHash, ...rest } = userData;
+
+    res
+      .status(200)
+      .cookie("access_token", token, {
+        httpOnly: true,
+      })
+      .json({ body: rest, message: "Sign up successful" });
   } catch (error: any) {
     if (error.code === 11000) {
       return next(errorHandler(409, "Email already exists"));

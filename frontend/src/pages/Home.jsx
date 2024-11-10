@@ -1,14 +1,17 @@
 import ForYouFollowing from "../components/ui/ForYouFollowing.jsx";
 import Posts from "../components/func/Posts.jsx";
 import TweetBox from "../components/ui/TweetBox.jsx";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+  const { currentUser } = useSelector((state) => state.user);
+
   return (
     <div className="">
       <ForYouFollowing active="for-you" />
 
       <TweetBox
-        profilePictureUrl="https://e1.pxfuel.com/desktop-wallpaper/708/299/desktop-wallpaper-wwe-randy-orton-weneedfun-randy-orton-2019-thumbnail.jpg"
+        profilePictureUrl={currentUser.avatarUrl}
         onPost={(text) => console.log("New Comment:", text)}
       />
 

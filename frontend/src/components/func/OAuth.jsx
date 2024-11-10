@@ -3,7 +3,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { fireapp } from "../../firebase.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { signInSuccess } from "../../redux/user/userSlice.js";
+import { signInFailure, signInSuccess } from "../../redux/user/userSlice.js";
 
 const OAuth = () => {
   const auth = getAuth(fireapp);
@@ -33,7 +33,7 @@ const OAuth = () => {
         navigate("/");
       }
     } catch (error) {
-      console.log(error);
+      dispatch(signInFailure(error))
     }
   };
 

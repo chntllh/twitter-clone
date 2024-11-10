@@ -1,11 +1,12 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
-import Layout from "../layout/Layout";
-import LoadingSpinner from "../components/ui/LoadingSpinner";
+import ProtectedRoutes from "./ProtectedRoutes.jsx";
 import ErrorPage from "../pages/ErrorPage";
 import PageNotFound from "../pages/PageNotFound";
-import ProtectedRoutes from "./ProtectedRoutes.jsx";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+
+import Layout from "../layout/Layout";
 
 /* eslint-disable react-refresh/only-export-components */
 const Home = lazy(() => import("../pages/Home"));
@@ -19,11 +20,11 @@ const SignIn = lazy(() => import("../pages/SignIn"));
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: <ProtectedRoutes />,
     errorElement: <ErrorPage />,
     children: [
       {
-        element: <ProtectedRoutes />,
+        element: <Layout />,
         children: [
           {
             index: true,

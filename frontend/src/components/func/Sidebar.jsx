@@ -39,11 +39,7 @@ const Sidebar = () => {
         />
 
         <div className="mt-auto mb-6 lg:mb-12">
-          <ProfileCard
-            username="warko"
-            handleName="Randy Orton"
-            pfpUrl="https://e1.pxfuel.com/desktop-wallpaper/708/299/desktop-wallpaper-wwe-randy-orton-weneedfun-randy-orton-2019-thumbnail.jpg"
-          />
+          <ProfileCard />
         </div>
       </div>
     </div>

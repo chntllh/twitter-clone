@@ -24,7 +24,7 @@ import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
 const Layout = () => {
   return (
     <div className="flex min-h-screen md:justify-center">
-      <div className="hidden md:block md:w-16 lg:w-[220px]">
+      <div className="hidden md:block md:w-16 lg:w-[250px]">
         <Sidebar />
       </div>
       <div className="border-x border-gray-600 md:w-[480px] lg:w-[600px]">

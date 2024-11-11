@@ -36,15 +36,23 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    signOutSuccess: (state) => {
+    signOut: (state) => {
       state.currentUser = null;
       state.error = null;
       state.loading = false;
-    }
+    },
   },
 });
 
-export const { signInStart, signInSuccess, signInFailure, signUpStart, signUpSuccess, signUpFailure, signOutSuccess  } = userSlice.actions;
+export const {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+  signUpStart,
+  signUpSuccess,
+  signUpFailure,
+  signOut,
+} = userSlice.actions;
 
 export const isAuthenticated = (state) => Boolean(state.user.currentUser);
 

@@ -10,13 +10,17 @@ const mentionSchema = new Schema<InterfaceMention>({
     type: Schema.Types.ObjectId,
     ref: "Tweet",
     required: true,
+    index: true,
   },
   mentionedUserId: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
 });
+
+mentionSchema.index({ tweetId: 1, mentionedUserId: 1 });
 
 const Mention: Model<InterfaceMention> = model("Mention", mentionSchema);
 

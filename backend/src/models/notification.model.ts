@@ -13,15 +13,18 @@ const notificationSchema = new Schema<InterfaceNotification>({
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
   actorId: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
   tweetId: {
     type: Schema.Types.ObjectId,
     ref: "Tweet",
+    index: true,
   },
   notificationType: {
     type: String,
@@ -32,6 +35,10 @@ const notificationSchema = new Schema<InterfaceNotification>({
     default: Date.now,
   },
 });
+
+notificationSchema.index({ userId: 1, createdAt: -1 });
+
+notificationSchema.index({ actorId: 1, tweetId: 1 });
 
 const Notification: Model<InterfaceNotification> = model(
   "Notification",

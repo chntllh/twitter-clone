@@ -14,6 +14,7 @@ const tweetSchema = new Schema<InterfaceTweet>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     content: {
       type: String,
@@ -27,6 +28,8 @@ const tweetSchema = new Schema<InterfaceTweet>(
   },
   { timestamps: true }
 );
+
+tweetSchema.index({ createdAt: -1 });
 
 const Tweet: Model<InterfaceTweet> = model("Tweet", tweetSchema);
 

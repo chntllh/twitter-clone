@@ -11,17 +11,25 @@ const followerSchema = new Schema<InterfaceFollower>({
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
   followerId: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
   followerAt: {
     type: Date,
     default: Date.now,
   },
 });
+
+followerSchema.index({ userId: 1, followerId: 1 }, { unique: true });
+
+followerSchema.index({ userId: 1 });
+
+followerSchema.index({ followerId: 1 });
 
 const Follower: Model<InterfaceFollower> = model("Follower", followerSchema);
 

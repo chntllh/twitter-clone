@@ -9,8 +9,11 @@ const hashtagSchema = new Schema<InterfaceHashtag>({
     type: String,
     unique: true,
     required: true,
+    index: true,
   },
 });
+
+hashtagSchema.index({ name: 1 }, { unique: true });
 
 const Hashtag: Model<InterfaceHashtag> = model("Hashtag", hashtagSchema);
 

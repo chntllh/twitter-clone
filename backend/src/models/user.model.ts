@@ -16,11 +16,13 @@ const userSchema = new Schema<InterfaceUser>(
     username: {
       type: String,
       unique: true,
+      index: true,
     },
     email: {
       type: String,
       unique: true,
       required: true,
+      index: true,
     },
     passwordHash: {
       type: String,
@@ -42,6 +44,10 @@ const userSchema = new Schema<InterfaceUser>(
   },
   { timestamps: true }
 );
+
+userSchema.index({ username: 1, email: 1 });
+
+userSchema.index({ createdAt: -1 });
 
 const User: Model<InterfaceUser> = model("User", userSchema);
 

@@ -10,13 +10,17 @@ const tweetHashtagSchema = new Schema<InterfaceTweetHashtag>({
     type: Schema.Types.ObjectId,
     ref: "Tweet",
     required: true,
+    index: true,
   },
   hashtagId: {
     type: Schema.Types.ObjectId,
     ref: "Hashtag",
     required: true,
+    index: true,
   },
 });
+
+tweetHashtagSchema.index({ tweetId: 1, hashtagId: 1 });
 
 const TweetHashtag: Model<InterfaceTweetHashtag> = model(
   "TweetHashtag",

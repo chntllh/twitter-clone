@@ -11,17 +11,22 @@ const retweetSchema = new Schema<InterfaceRetweet>({
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
   tweetId: {
     type: Schema.Types.ObjectId,
     ref: "Tweet",
     required: true,
+    index: true,
   },
   retweetedAt: {
     type: Date,
     default: Date.now,
+    index: true,
   },
 });
+
+retweetSchema.index({ userId: 1, tweetId: 1, retweetedAt: 1 });
 
 const Retweet: Model<InterfaceRetweet> = model("Retweet", retweetSchema);
 

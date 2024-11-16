@@ -17,15 +17,16 @@ app.use(cookieParser());
 app.listen(3000, () => console.log("Server running on port 3000"));
 
 // Routes
-
 import userRoutes from "./routes/user.routes";
 app.use("/api/user", userRoutes);
 import authRoutes from "./routes/auth.routes";
 app.use("/api/auth", authRoutes);
 import tweetRoutes from "./routes/tweet.routes";
 app.use("/api/tweet", tweetRoutes);
-// Middleware
+import followRoutes from "./routes/follow.routes";
+app.use("/api/follow", followRoutes);
 
+// Middleware
 app.use(
   (
     error: Error & { statusCode?: number },

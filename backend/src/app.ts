@@ -22,7 +22,8 @@ import userRoutes from "./routes/user.routes";
 app.use("/api/user", userRoutes);
 import authRoutes from "./routes/auth.routes";
 app.use("/api/auth", authRoutes);
-
+import tweetRoutes from "./routes/tweet.routes";
+app.use("/api/tweet", tweetRoutes);
 // Middleware
 
 app.use(

@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
   follow,
   followers,
@@ -8,7 +8,7 @@ import {
 } from "../controllers/follow.controller";
 import { protect } from "../middleware/protect";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/test", test);
 router.post("/follow/:userId", protect, follow);

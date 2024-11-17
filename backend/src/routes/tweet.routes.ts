@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import { protect } from "../middleware/protect";
 import {
   getAllTweets,
@@ -7,7 +7,7 @@ import {
   test,
 } from "../controllers/tweet.controller";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/test", test);
 router.post("/", protect, postTweet);

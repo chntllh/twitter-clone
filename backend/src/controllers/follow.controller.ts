@@ -2,6 +2,7 @@ import mongoose, { ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Follower from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
+import User from "../models/user.model";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -30,10 +31,13 @@ export const follow = async (
     }
 
     const follow = new Follower({
-      userId: req.user.id,
-      followerId: userId,
+      userId: userId,
+      followerId: req.user.id,
     });
     await follow.save();
+
+    await User.findByIdAndUpdate(userId, { $inc: { followersCount: 1 } });
+    await User.findByIdAndUpdate(req.user.id, { $inc: { followingCount: 1 } });
 
     res.status(200).json({ body: follow });
   } catch (error: any) {
@@ -60,10 +64,18 @@ export const unfollow = async (
       return next(errorHandler(400, "No user"));
     }
 
-    await Follower.findOneAndDelete({
-      userId: req.user.id,
-      followerId: userId,
+    const deleteFollow = await Follower.findOneAndDelete({
+      userId: userId,
+      followerId: req.user.id,
     });
+
+    if (!deleteFollow) {
+      return next(errorHandler(404, "Follow not found for user"));
+    }
+
+    await User.findByIdAndUpdate(userId, { $inc: { followersCount: -1 } });
+    await User.findByIdAndUpdate(req.user.id, { $inc: { followingCount: -1 } });
+
     res.status(200).json({ message: "Unfollowed successfully" });
   } catch (error) {
     next(error);

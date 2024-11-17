@@ -9,6 +9,8 @@ export interface InterfaceUser extends Document {
   avatarUrl?: string;
   createdAt: Date;
   updatedAt: Date;
+  followersCount: number;
+  followingCount: number;
 }
 
 const userSchema = new Schema<InterfaceUser>(
@@ -40,6 +42,14 @@ const userSchema = new Schema<InterfaceUser>(
       type: String,
       default:
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSXb4pT4uOsvRQYT4H9MI9TwfkMAMRHXWscAw&s",
+    },
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+    followingCount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

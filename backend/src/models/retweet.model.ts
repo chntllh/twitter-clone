@@ -22,11 +22,10 @@ const retweetSchema = new Schema<InterfaceRetweet>({
   retweetedAt: {
     type: Date,
     default: Date.now,
-    index: true,
   },
 });
 
-retweetSchema.index({ userId: 1, tweetId: 1, retweetedAt: 1 });
+retweetSchema.index({ userId: 1, tweetId: 1 }, { unique: true });
 
 const Retweet: Model<InterfaceRetweet> = model("Retweet", retweetSchema);
 

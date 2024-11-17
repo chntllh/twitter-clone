@@ -25,6 +25,8 @@ import tweetRoutes from "./routes/tweet.routes";
 app.use("/api/tweet", tweetRoutes);
 import followRoutes from "./routes/follow.routes";
 app.use("/api/follow", followRoutes);
+import tweetActionsRoutes from "./routes/tweetActions.routes";
+app.use("/api/actions", tweetActionsRoutes);
 
 // Middleware
 app.use(

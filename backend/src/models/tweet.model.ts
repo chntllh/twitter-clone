@@ -4,6 +4,8 @@ export interface InterfaceTweet extends Document {
   userId: Schema.Types.ObjectId;
   content: string;
   imageUrl?: string;
+  likesCount: number;
+  retweetCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +26,14 @@ const tweetSchema = new Schema<InterfaceTweet>(
     imageUrl: {
       type: String,
       required: false,
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+    retweetCount: {
+      type: Number,
+      default: 0,
     },
   },
   { timestamps: true }

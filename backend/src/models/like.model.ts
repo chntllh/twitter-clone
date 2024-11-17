@@ -25,7 +25,7 @@ const likeSchema = new Schema<InterfaceLike>({
   },
 });
 
-likeSchema.index({ userId: 1, tweetId: 1 });
+likeSchema.index({ userId: 1, tweetId: 1 }, { unique: true });
 
 const Like: Model<InterfaceLike> = model("Like", likeSchema);
 

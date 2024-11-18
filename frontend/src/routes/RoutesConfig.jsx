@@ -46,6 +46,10 @@ const router = createBrowserRouter([
             path: "settings",
             element: <Settings />,
           },
+          {
+            path: "*",
+            element: <PageNotFound />,
+          },
         ],
       },
     ],
@@ -55,14 +59,6 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<LoadingSpinner />}>
         <SignIn />
-      </Suspense>
-    ),
-  },
-  {
-    path: "*",
-    element: (
-      <Suspense fallback={<LoadingSpinner />}>
-        <PageNotFound />
       </Suspense>
     ),
   },

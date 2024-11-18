@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signOut } from "../../redux/user/userSlice.js";
+import { signOut } from "../../store/reducer/user.reducer.js";
 
 const ProfileCard = () => {
   const { currentUser } = useSelector((state) => state.user);

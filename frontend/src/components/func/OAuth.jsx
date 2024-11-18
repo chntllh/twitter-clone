@@ -3,7 +3,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { fireapp } from "../../firebase.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { signInFailure, signInSuccess } from "../../redux/user/userSlice.js";
+import { signInFailure, signInSuccess } from "../../store/reducer/user.reducer.js";
 
 const OAuth = () => {
   const auth = getAuth(fireapp);

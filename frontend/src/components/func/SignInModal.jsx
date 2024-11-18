@@ -8,7 +8,7 @@ import {
   signInFailure,
   signInStart,
   signInSuccess,
-} from "../../redux/user/userSlice.js";
+} from "../../store/reducer/user.reducer.js";
 import { useNavigate } from "react-router-dom";
 
 const SignInModal = ({ isOpen, onClose, onSignUpOpen }) => {

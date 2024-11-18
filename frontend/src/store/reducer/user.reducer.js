@@ -6,7 +6,7 @@ const initialState = {
   loading: false,
 };
 
-const userSlice = createSlice({
+const user = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -52,8 +52,6 @@ export const {
   signUpSuccess,
   signUpFailure,
   signOut,
-} = userSlice.actions;
+} = user.actions;
 
-export const isAuthenticated = (state) => Boolean(state.user.currentUser);
-
-export default userSlice.reducer;
+export default user.reducer;

@@ -3,7 +3,7 @@ import App from "./App.jsx";
 import "./index.css";
 import ThemeProvider from "./components/ThemeProvider.jsx";
 import { PersistGate } from "redux-persist/integration/react";
-import { persistor, store } from "./redux/store.js";
+import { persistor, store } from "./store/store.js";
 import { Provider } from "react-redux";
 import ErrorPopup from "./components/ui/ErrorPopup.jsx";
 

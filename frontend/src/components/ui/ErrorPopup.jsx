@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signInFailure } from "../../redux/user/userSlice.js";
+import { signInFailure } from "../../store/reducer/user.reducer.js";
 
 const ErrorPopup = () => {
   const dispatch = useDispatch()

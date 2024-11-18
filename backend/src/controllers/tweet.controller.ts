@@ -57,7 +57,7 @@ export const getAllTweets = async (
         "username displayName avatarUrl"
       )
       .sort("-createdAt")
-      .select("content likesCount retweetCount createdAt userId")
+      .select("content imageUrl likesCount retweetCount createdAt userId")
       .lean();
 
     const formattedTweets = tweets.map((tweet) => ({
@@ -67,6 +67,7 @@ export const getAllTweets = async (
       displayName: tweet.userId.displayName,
       username: tweet.userId.username,
       content: tweet.content,
+      imageUrl: tweet.imageUrl,
       likesCount: tweet.likesCount,
       retweetCount: tweet.retweetCount,
       createdAt: tweet.createdAt,

@@ -7,17 +7,21 @@ import {
   HiOutlineChatBubbleOvalLeft,
   HiOutlineHeart,
 } from "react-icons/hi2";
+import { getRelativeTime } from "../../utils/relativeTime.js";
 
-const Post = ({ postUser }) => {
+const Post = ({ post }) => {
   const {
-    profilePictureUrl,
+    avatarUrl,
+    displayName,
     username,
-    handle,
-    postDate,
+    createdAt,
     content,
     imageUrl,
-    stats: { comments, retweets, likes, shares },
-  } = postUser;
+    commentsCount = 0,
+    retweetCount = 0,
+    likesCount = 0,
+    sharesCount = 0,
+  } = post;
 
   return (
     <div className="flex p-4 border-b border-gray-600">
@@ -25,21 +29,21 @@ const Post = ({ postUser }) => {
       <div className="w-14 cursor-pointer">
         <img
           className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-md"
-          src={profilePictureUrl}
-          alt={`${username}'s profile`}
+          src={avatarUrl}
+          alt={`${displayName}'s profile`}
         />
       </div>
 
       {/* Post Content */}
       <div className="w-full px-2">
-        {/* Header: Username, Handle, and Options */}
+        {/* Header: displayName, username, and Options */}
         <div className="flex justify-between">
           <div className="flex gap-1">
             <h1 className="font-medium hover:underline cursor-pointer">
-              {username}
+              {displayName}
             </h1>
             <h1 className="font-light text-gray-300">
-              @{handle} · {postDate}
+              @{username} · {getRelativeTime(createdAt)}
             </h1>
           </div>
           <HiEllipsisHorizontal className="text-2xl cursor-pointer" />
@@ -61,23 +65,23 @@ const Post = ({ postUser }) => {
           </div>
         )}
 
-        {/* Post Actions: Comments, Retweets, Likes, etc. */}
+        {/* Post Actions: commentsCount, retweetCount, likesCount, etc. */}
         <div className="w-full flex pt-3 justify-between items-center text-xl text-gray-400">
           <div className="flex items-center gap-1">
             <HiOutlineChatBubbleOvalLeft />
-            <div className="text-sm">{comments}</div>
+            <div className="text-sm">{commentsCount}</div>
           </div>
           <div className="flex items-center gap-1">
             <HiArrowPathRoundedSquare />
-            <div className="text-sm">{retweets}</div>
+            <div className="text-sm">{retweetCount}</div>
           </div>
           <div className="flex items-center gap-1">
             <HiOutlineHeart />
-            <div className="text-sm">{likes}</div>
+            <div className="text-sm">{likesCount}</div>
           </div>
           <div className="flex items-center gap-1">
             <HiOutlineBars3CenterLeft />
-            <div className="text-sm">{shares}</div>
+            <div className="text-sm">{sharesCount}</div>
           </div>
           <div className="flex items-center gap-1">
             <HiOutlineBookmark />
@@ -87,6 +91,6 @@ const Post = ({ postUser }) => {
       </div>
     </div>
   );
-}
+};
 
 export default Post;

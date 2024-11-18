@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { errorHandler } from "../middleware/errorHandler";
 import Tweet from "../models/tweet.model";
 import mongoose, { isValidObjectId, ObjectId } from "mongoose";
+import { InterfaceUser } from "../models/user.model";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -45,16 +46,33 @@ export const postTweet = async (
 };
 
 export const getAllTweets = async (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const tweets = await Tweet.find()
-      .populate("userId", "username avatarUrl")
-      .sort("-createdAt");
+      .populate<{ userId: InterfaceUser }>(
+        "userId",
+        "username displayName avatarUrl"
+      )
+      .sort("-createdAt")
+      .select("content likesCount retweetCount createdAt userId")
+      .lean();
 
-    res.json(tweets);
+    const formattedTweets = tweets.map((tweet) => ({
+      tweetId: tweet._id,
+      userId: tweet.userId._id,
+      avatarUrl: tweet.userId.avatarUrl,
+      displayName: tweet.userId.displayName,
+      username: tweet.userId.username,
+      content: tweet.content,
+      likesCount: tweet.likesCount,
+      retweetCount: tweet.retweetCount,
+      createdAt: tweet.createdAt,
+    }));
+
+    res.json(formattedTweets);
   } catch (error) {
     next(error);
   }

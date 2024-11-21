@@ -10,6 +10,32 @@ export interface CustomRequest extends Request {
   };
 }
 
+interface FormattedTweet {
+  tweetId: string;
+  userId: string;
+  avatarUrl?: string;
+  displayName: string;
+  username: string;
+  content: string;
+  imageUrl?: string;
+  likesCount: number;
+  retweetCount: number;
+  createdAt: Date;
+}
+
+const formatTweet = (tweet: any): FormattedTweet => ({
+  tweetId: tweet._id.toString(),
+  userId: tweet.userId._id.toString(),
+  avatarUrl: tweet.userId.avatarUrl,
+  displayName: tweet.userId.displayName,
+  username: tweet.userId.username,
+  content: tweet.content,
+  imageUrl: tweet.imageUrl,
+  likesCount: tweet.likesCount,
+  retweetCount: tweet.retweetCount,
+  createdAt: tweet.createdAt,
+});
+
 export const test = (req, res) => {
   res.json({ message: "tweet api working" });
 };
@@ -39,7 +65,20 @@ export const postTweet = async (
     const tweet = new Tweet(tweetData);
     await tweet.save();
 
-    res.status(200).json({ body: tweet });
+    const populatedTweet = await Tweet.findById(tweet._id)
+      .populate<{ userId: InterfaceUser }>(
+        "userId",
+        "username displayName avatarUrl"
+      )
+      .lean();
+
+    if (!populatedTweet) {
+      return next(errorHandler(404, "Tweet not found"));
+    }
+
+    const formattedTweet: FormattedTweet = formatTweet(populatedTweet);
+
+    res.status(200).json(formattedTweet);
   } catch (error) {
     next(error);
   }
@@ -54,26 +93,17 @@ export const getAllTweets = async (
     const tweets = await Tweet.find()
       .populate<{ userId: InterfaceUser }>(
         "userId",
-        "username displayName avatarUrl"
+        "_id username displayName avatarUrl"
       )
       .sort("-createdAt")
       .select("content imageUrl likesCount retweetCount createdAt userId")
       .lean();
 
-    const formattedTweets = tweets.map((tweet) => ({
-      tweetId: tweet._id,
-      userId: tweet.userId._id,
-      avatarUrl: tweet.userId.avatarUrl,
-      displayName: tweet.userId.displayName,
-      username: tweet.userId.username,
-      content: tweet.content,
-      imageUrl: tweet.imageUrl,
-      likesCount: tweet.likesCount,
-      retweetCount: tweet.retweetCount,
-      createdAt: tweet.createdAt,
-    }));
+    const formattedTweets: FormattedTweet[] = tweets.map((tweet) =>
+      formatTweet(tweet)
+    );
 
-    res.json(formattedTweets);
+    res.status(200).json(formattedTweets);
   } catch (error) {
     next(error);
   }
@@ -92,10 +122,19 @@ export const getUserTweets = async (
     }
 
     const tweets = await Tweet.find({ userId: userId })
-      .populate("userId", "_id displayName username avatarUrl")
-      .sort("-createdAt");
+      .populate<{ userId: InterfaceUser }>(
+        "userId",
+        "_id displayName username avatarUrl"
+      )
+      .sort("-createdAt")
+      .select("content imageUrl likesCount retweetCount createdAt userId")
+      .lean();
 
-    res.json(tweets);
+    const formattedTweets: FormattedTweet[] = tweets.map((tweet) =>
+      formatTweet(tweet)
+    );
+
+    res.status(200).json(formattedTweets);
   } catch (error) {
     next(error);
   }

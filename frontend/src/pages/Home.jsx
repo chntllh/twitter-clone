@@ -23,7 +23,9 @@ const Home = () => {
     fetchPosts();
   }, []);
 
-  console.log(posts);
+  const postTweet = (post) => {
+    setPosts((rest) => [post, ...rest]);
+  };
 
   return (
     <div className="">
@@ -31,11 +33,11 @@ const Home = () => {
 
       <TweetBox
         profilePictureUrl={currentUser.avatarUrl}
-        onPost={(text) => console.log("New Comment:", text)}
+        onPost={(post) => postTweet(post)}
       />
 
-      {posts.map((post, index) => (
-        <Post post={post} key={index} />
+      {posts.map((post) => (
+        <Post post={post} key={post.tweetId} />
       ))}
     </div>
   );

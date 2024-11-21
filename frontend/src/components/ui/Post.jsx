@@ -58,7 +58,7 @@ const Post = ({ post }) => {
         {imageUrl && (
           <div className="cursor-pointer">
             <img
-              className="max-h-[300px] max-w-full object-cover mx-auto border-2 border-gray-300 rounded-2xl"
+              className="max-h-[600px] max-w-full object-cover mx-auto border-2 border-gray-300 rounded-2xl"
               src={imageUrl}
               alt="Post"
             />

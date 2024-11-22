@@ -5,6 +5,26 @@ import { errorHandler } from "../middleware/errorHandler";
 import User, { InterfaceUser } from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
 
+interface FormattedUser {
+  userId: string;
+  username: string;
+  displayName: string;
+  bio: string | undefined;
+  avatarUrl: string;
+  followersCount: number;
+  followingCount: number;
+}
+
+const formatUser = (user: any): FormattedUser => ({
+  userId: user._id,
+  username: user.username,
+  displayName: user.displayName,
+  bio: user.bio,
+  avatarUrl: user.avatarUrl,
+  followersCount: user.followersCount,
+  followingCount: user.followingCount,
+});
+
 export const test = (req: Request, res: Response) => {
   res.json({ message: "Auth API path is working" });
 };
@@ -35,16 +55,16 @@ export const register = async (
   const randomSuffix = crypto.randomBytes(3).toString("hex");
   const username = `${name.split(" ")[0].toLowerCase()}${randomSuffix}`;
 
-  const hashedPassword: string = bcryptjs.hashSync(password, 10);
-
-  const newUser = new User({
-    displayName: name,
-    username: username,
-    email,
-    passwordHash: hashedPassword,
-  });
-
   try {
+    const hashedPassword: string = await bcryptjs.hash(password, 10);
+
+    const newUser = new User({
+      displayName: name,
+      username: username,
+      email,
+      passwordHash: hashedPassword,
+    });
+
     if (!process.env.JWT_SECRET) {
       return next(errorHandler(500, "Internal server error"));
     }
@@ -53,15 +73,16 @@ export const register = async (
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
 
-    const userData = newUser.toObject();
-    const { passwordHash, ...rest } = userData;
+    const userData: FormattedUser = formatUser(newUser.toObject());
 
     res
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
       })
-      .json({ body: rest, message: "Sign up successful" });
+      .json({ userData });
   } catch (error: any) {
     if (error.code === 11000) {
       return next(errorHandler(409, "Email already exists"));
@@ -82,7 +103,7 @@ export const login = async (
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const isEmail = emailRegex.test(identifier);
+  const isEmail: boolean = emailRegex.test(identifier);
 
   try {
     const validUser = await User.findOne(
@@ -92,7 +113,7 @@ export const login = async (
       return next(errorHandler(400, "Invalid email/username or password"));
     }
 
-    const validPassword = bcryptjs.compareSync(
+    const validPassword: boolean = await bcryptjs.compare(
       password,
       validUser.passwordHash
     );
@@ -105,15 +126,16 @@ export const login = async (
     }
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
 
-    const userData = validUser.toObject();
-    const { passwordHash: pass, ...rest } = userData;
+    const userData: FormattedUser = formatUser(validUser.toObject());
 
     res
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
       })
-      .json(rest);
+      .json(userData);
   } catch (error) {
     next(error);
   }
@@ -126,24 +148,25 @@ export const google = async (
 ) => {
   const { email, name, googlePhotoUrl } = req.body;
 
-  try {
-    if (!process.env.JWT_SECRET) {
-      return next(errorHandler(500, "Internal server error"));
-    }
+  if (!process.env.JWT_SECRET) {
+    return next(errorHandler(500, "Internal server error"));
+  }
 
+  try {
     const user = await User.findOne({ email });
+
     if (user) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      const { passwordHash, ...rest } = user.toObject();
+      const userData = formatUser(user.toObject());
       res
         .status(200)
         .cookie("access_token", token, { httpOnly: true })
-        .json(rest);
+        .json(userData);
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
         Math.random().toString(36).slice(-8);
-      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      const hashedPassword = await bcryptjs.hash(generatedPassword, 10);
 
       const randomSuffix = crypto.randomBytes(3).toString("hex");
       const username = `${name.split(" ")[0].toLowerCase()}${randomSuffix}`;
@@ -160,12 +183,16 @@ export const google = async (
 
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
 
-      const { passwordHash, ...rest } = newUser.toObject();
+      const userData: FormattedUser = formatUser(newUser.toObject());
 
       res
         .status(200)
-        .cookie("access_token", token, { httpOnly: true })
-        .json(rest);
+        .cookie("access_token", token, {
+          httpOnly: true,
+          sameSite: "strict",
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .json(userData);
     }
   } catch (error) {
     next(error);

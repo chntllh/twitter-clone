@@ -3,6 +3,26 @@ import User from "../models/user.model";
 import mongoose from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 
+interface FormattedUser {
+  userId: string;
+  username: string;
+  displayName: string;
+  bio: string | undefined;
+  avatarUrl: string;
+  followersCount: number;
+  followingCount: number;
+}
+
+const formatUser = (user: any): FormattedUser => ({
+  userId: user._id,
+  username: user.username,
+  displayName: user.displayName,
+  bio: user.bio,
+  avatarUrl: user.avatarUrl,
+  followersCount: user.followersCount,
+  followingCount: user.followingCount,
+});
+
 export const test = (req: Request, res: Response) => {
   res.json({ message: "API is working!" });
 };
@@ -25,18 +45,11 @@ export const getUser = async (
       return next(errorHandler(404, "No user found"));
     }
 
-    const formattedUser = {
-      userId: user._id,
-      username: user.username,
-      displayName: user.displayName,
-      bio: user.bio,
-      avatarUrl: user.avatarUrl,
-      followersCount: user.followersCount,
-      followingCount: user.followingCount,
-    };
+    const formattedUser: FormattedUser = formatUser(user);
 
     res.status(200).json(formattedUser);
   } catch (error) {
     next(error);
   }
 };
+

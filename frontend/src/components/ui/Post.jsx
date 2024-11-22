@@ -8,6 +8,8 @@ import {
   HiOutlineHeart,
 } from "react-icons/hi2";
 import { getRelativeTime } from "../../utils/relativeTime.js";
+import { useEffect, useRef, useState } from "react";
+import HoverCard from "./HoverCard.jsx";
 
 const Post = ({ post }) => {
   const {
@@ -21,20 +23,64 @@ const Post = ({ post }) => {
     retweetCount = 0,
     likesCount = 0,
     sharesCount = 0,
+    userId,
   } = post;
 
+  const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const visibleTimeoutRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (visibleTimeoutRef.current) clearTimeout(visibleTimeoutRef.current);
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    setIsHovered(true);
+    setIsVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setIsHovered(false);
+    }, 500);
+    visibleTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (visibleTimeoutRef.current) clearTimeout(visibleTimeoutRef.current);
+      if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    };
+  }, []);
+
   return (
-    <div className="flex p-4 border-b border-gray-600">
-      {/* Profile Picture */}
-      <div className="w-14 cursor-pointer">
+    <div className="flex p-4 border-b border-gray-600 relative">
+      <div
+        className="relative w-14 h-14 cursor-pointer"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {/* Profile Picture */}
         <img
-          className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-md"
+          className="object-cover rounded-full"
           src={avatarUrl}
           alt={`${displayName}'s profile`}
         />
+
+        {/* Hover Card */}
+        {isVisible && (
+          <div
+            className={`absolute top-12 left-1/2 transform -translate-x-1/2 z-10 transition-opacity duration-500 ${
+              isHovered ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <HoverCard userId={userId} />
+          </div>
+        )}
       </div>
 
-      {/* Post Content */}
       <div className="w-full px-2">
         {/* Header: displayName, username, and Options */}
         <div className="flex justify-between">

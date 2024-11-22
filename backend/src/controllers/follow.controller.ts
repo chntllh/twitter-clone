@@ -1,4 +1,4 @@
-import mongoose, { ObjectId } from "mongoose";
+import mongoose, { isValidObjectId, ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Follower from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
@@ -22,8 +22,8 @@ export const follow = async (
   try {
     const { userId } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(404, "User not found"));
+    if (!userId || !isValidObjectId(userId)) {
+      return next(errorHandler(404, "Invalid userId"));
     }
 
     if (!req.user) {
@@ -56,8 +56,8 @@ export const unfollow = async (
   try {
     const { userId } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(404, "User not found"));
+    if (!userId || !isValidObjectId(userId)) {
+      return next(errorHandler(404, "Invalid userId"));
     }
 
     if (!req.user) {
@@ -90,8 +90,8 @@ export const followers = async (
   try {
     const { userId } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(404, "User not found"));
+    if (!userId || !isValidObjectId(userId)) {
+      return next(errorHandler(404, "Invalid userId"));
     }
 
     const followers = await Follower.find({ userId: userId }).populate(
@@ -114,7 +114,7 @@ export const following = async (
     const { userId } = req.params;
 
     if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(404, "User not found"));
+      return next(errorHandler(404, "Invalid userId"));
     }
 
     const followers = await Follower.find({ followerId: userId }).populate(
@@ -123,6 +123,31 @@ export const following = async (
     );
 
     res.status(200).json(followers);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const isFollowing = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId || !isValidObjectId(userId)) {
+      return next(errorHandler(404, "Invalid userId"));
+    }
+
+    if (!req.user) {
+      return next(errorHandler(400, "No user"));
+    }
+
+    const followExists = await Follower.findOne({
+      userId,
+      followerId: req.user.id,
+    });
+
+    res.status(200).json({
+      isFollowing: !!followExists,
+    });
   } catch (error) {
     next(error);
   }

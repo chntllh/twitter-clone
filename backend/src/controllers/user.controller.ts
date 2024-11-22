@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
-import mongoose from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 
 interface FormattedUser {
@@ -33,13 +33,21 @@ export const getUser = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(404, "User ID wrong"));
+    let query = {};
+
+    if (!identifier) {
+      return next(errorHandler(404, "No identifier"));
     }
 
-    const user = await User.findById(userId);
+    if (isValidObjectId(identifier)) {
+      query = { _id: identifier };
+    } else {
+      query = { username: identifier };
+    }
+
+    const user = await User.findOne(query);
 
     if (!user) {
       return next(errorHandler(404, "No user found"));
@@ -52,4 +60,3 @@ export const getUser = async (
     next(error);
   }
 };
-

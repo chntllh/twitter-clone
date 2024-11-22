@@ -5,6 +5,6 @@ import { protect } from "../middleware/protect";
 const router = Router();
 
 router.get("/test", test);
-router.get("/:userId", protect, getUser);
+router.get("/:identifier", protect, getUser);
 
 export default router;

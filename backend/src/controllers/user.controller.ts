@@ -11,6 +11,7 @@ interface FormattedUser {
   avatarUrl: string;
   followersCount: number;
   followingCount: number;
+  createdAt: Date;
 }
 
 const formatUser = (user: any): FormattedUser => ({
@@ -21,6 +22,7 @@ const formatUser = (user: any): FormattedUser => ({
   avatarUrl: user.avatarUrl,
   followersCount: user.followersCount,
   followingCount: user.followingCount,
+  createdAt: user.createdAt,
 });
 
 export const test = (req: Request, res: Response) => {

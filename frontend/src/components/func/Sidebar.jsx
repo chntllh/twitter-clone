@@ -68,7 +68,7 @@ const Sidebar = () => {
           icon={<BiBell />}
         />
         <SidebarNavigationButton
-          destination="/profile"
+          destination={`/${currentUser.username}`}
           text="Profile"
           icon={<BiUser />}
         />

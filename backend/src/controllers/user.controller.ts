@@ -137,6 +137,9 @@ export const updateUser = async (
     }
 
     if (bio !== undefined) {
+      if (bio.length > 160) {
+        return next(errorHandler(400, "Bio must not exist 160 characters."));
+      }
       user.bio = bio;
     }
 

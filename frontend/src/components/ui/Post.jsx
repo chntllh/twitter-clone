@@ -58,13 +58,13 @@ const Post = ({ post }) => {
   return (
     <div className="flex p-4 border-b border-gray-600 relative">
       <div
-        className="relative w-14 h-14 cursor-pointer"
+        className="relative w-16 h-16 cursor-pointer"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         {/* Profile Picture */}
         <img
-          className="object-cover rounded-full"
+          className="left-0 top-0 w-14 h-14 object-cover rounded-full"
           src={avatarUrl}
           alt={`${displayName}'s profile`}
         />

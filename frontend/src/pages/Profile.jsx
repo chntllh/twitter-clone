@@ -20,7 +20,6 @@ const Profile = () => {
     const fetchUserPosts = async (userId) => {
       try {
         const response = await axios.get(`/api/tweet/user/${userId}`);
-        console.log("Post fetch");
         setPosts(response.data);
       } catch (error) {
         console.error("Error fetching posts: ", error);
@@ -30,7 +29,6 @@ const Profile = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(`/api/user/${username}`);
-        console.log("User fetch");
         setUser(response.data);
         fetchUserPosts(response.data.userId);
       } catch (error) {

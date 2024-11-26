@@ -133,7 +133,13 @@ export const updateUser = async (
     }
 
     if (displayName) {
-      user.displayName = displayName;
+      const trimmed: string = displayName.trim();
+      if (trimmed.length < 1 || trimmed.length > 50) {
+        return next(
+          errorHandler(400, "Name must be between 1 and 50 characters.")
+        );
+      }
+      user.displayName = trimmed;
     }
 
     if (bio !== undefined) {

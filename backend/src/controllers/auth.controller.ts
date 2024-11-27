@@ -27,6 +27,8 @@ const formatUser = (user: any): FormattedUser => ({
   createdAt: user.createdAt,
 });
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export const test = (req: Request, res: Response) => {
   res.json({ message: "Auth API path is working" });
 };
@@ -49,7 +51,6 @@ export const register = async (
     return next(errorHandler(400, "All fields are required"));
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return next(errorHandler(400, "Invalid email format"));
   }
@@ -84,7 +85,7 @@ export const register = async (
         sameSite: "strict",
         maxAge: 24 * 60 * 60 * 1000,
       })
-      .json({ userData });
+      .json(userData);
   } catch (error: any) {
     if (error.code === 11000) {
       return next(errorHandler(409, "Email already exists"));
@@ -104,7 +105,6 @@ export const login = async (
     return next(errorHandler(400, "All fields are required"));
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isEmail: boolean = emailRegex.test(identifier);
 
   try {

@@ -1,22 +1,28 @@
 import { Outlet } from "react-router-dom";
-import RightSidebar from "../components/func/RightSidebar.jsx";
-import Sidebar from "../components/func/Sidebar.jsx";
+import RightSidebar from "./RightSidebar.jsx";
+import Sidebar from "./Sidebar.jsx";
 import { Suspense } from "react";
 import LoadingSpinner from "../components/ui/LoadingSpinner.jsx";
 
 const Layout = () => {
   return (
-    <div className="flex min-h-screen md:justify-center">
-      <div className="hidden md:block md:w-16 lg:w-[250px]">
-        <Sidebar />
+    <div className="flex min-h-screen justify-center scrollbar-none overflow-y-auto max-h-screen">
+      <div className="sticky top-0 border-r border-gray-600">
+        <div className="hidden md:block md:w-16 lg:w-[220px]">
+          <Sidebar />
+        </div>
       </div>
-      <div className="border-x border-gray-600 md:w-[480px] lg:w-[600px]">
-        <Suspense fallback={<LoadingSpinner />}>
-          <Outlet />
-        </Suspense>
+      <div className="sm:w-[600px]">
+        <div className="">
+          <Suspense fallback={<LoadingSpinner />}>
+            <Outlet />
+          </Suspense>
+        </div>
       </div>
-      <div className="hidden lg:block lg:w-[240px] xl:w-[300px]">
-        <RightSidebar />
+      <div className="sticky top-0 border-l border-gray-600">
+        <div className="hidden lg:block lg:w-[240px] xl:w-[320px]">
+          <RightSidebar />
+        </div>
       </div>
     </div>
   );

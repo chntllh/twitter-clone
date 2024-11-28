@@ -1,9 +1,9 @@
-import SidebarNavigationButton from "../ui/SidebarNavigationButton.jsx";
+import SidebarNavigationButton from "../components/ui/SidebarNavigationButton.jsx";
 import { BiBell, BiHome, BiSearch, BiSolidCog, BiUser } from "react-icons/bi";
 import { FaXTwitter } from "react-icons/fa6";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
-import { signOut } from "../../store/reducer/user.reducer.js";
+import { signOut } from "../store/reducer/user.reducer.js";
 
 const Sidebar = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -45,7 +45,7 @@ const Sidebar = () => {
   }
 
   return (
-    <div className="sticky top-0 hidden md:block h-screen">
+    <div className="sticky top-0 hidden sm:block h-screen">
       <div className="flex flex-col h-full lg:w-[90%] gap-2 items-center lg:items-start">
         <div className="ml-1 lg:ml-2 mt-6 lg:mt-4">
           <FaXTwitter className="hidden lg:block" size={48} />

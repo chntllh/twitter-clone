@@ -14,8 +14,8 @@ import {
   BiSolidFileGif,
 } from "react-icons/bi";
 import { MdClose } from "react-icons/md";
-import { fireapp } from "../../firebase.js";
 import axios from "axios";
+import { fireapp } from "../../../firebase.js";
 
 const TweetBox = ({ profilePictureUrl, onPost }) => {
   const [text, setText] = useState("");

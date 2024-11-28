@@ -1,9 +1,9 @@
-import ForYouFollowing from "../components/ui/ForYouFollowing.jsx";
-import TweetBox from "../components/ui/TweetBox.jsx";
+import ForYouFollowing from "../components/ui/Home/ForYouFollowing.jsx";
 import { useSelector } from "react-redux";
-import Post from "../components/ui/Post.jsx";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Post from "../components/ui/Post/Post.jsx";
+import TweetBox from "../components/ui/Home/TweetBox.jsx";
 
 const Home = () => {
   const { currentUser } = useSelector((state) => state.user);

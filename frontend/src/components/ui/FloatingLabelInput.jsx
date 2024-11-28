@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const FloatingLabelInput = ({
+  id = "",
   label = "",
   type = "text",
   value = "",
@@ -31,6 +32,7 @@ const FloatingLabelInput = ({
     <div className="relative w-full">
       {adjustableHeight ? (
         <textarea
+          id={id}
           type={type}
           ref={inputRef}
           value={value}
@@ -46,6 +48,7 @@ const FloatingLabelInput = ({
         />
       ) : (
         <input
+          id={id}
           type={type}
           value={value}
           onChange={handleInputChange}
@@ -58,6 +61,7 @@ const FloatingLabelInput = ({
         />
       )}
       <label
+        htmlFor={id}
         className={`absolute left-3 transition-all duration-300 ease-in-out pointer-events-none 
           ${isFocused ? "text-blue-500" : "text-gray-500"}
           ${isFocused || value ? "top-1 text-xs" : "top-4 text-base"}`}

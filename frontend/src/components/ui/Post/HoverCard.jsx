@@ -46,7 +46,7 @@ const HoverCard = ({ userId }) => {
 
   return (
     <div
-      className="p-4 z-10 w-72 relative bg-black border border-gray-600 rounded-lg"
+      className="p-4 z-10 left-28 md:left-0 w-72 relative bg-black border border-gray-600 rounded-lg"
       style={{
         boxShadow: "0px 0px 10px rgba(100, 100, 100, 1)",
       }}

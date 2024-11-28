@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import FloatingLabelInput from "../ui/FloatingLabelInput.jsx";
+import FloatingLabelInput from "../FloatingLabelInput.jsx";
 import { TbCameraPlus } from "react-icons/tb";
 import {
   getDownloadURL,
@@ -7,10 +7,10 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { fireapp } from "../../firebase.js";
+import { fireapp } from "../../../firebase.js";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { signInSuccess } from "../../store/reducer/user.reducer.js";
+import { signInSuccess } from "../../../store/reducer/user.reducer.js";
 
 const EditProfileModal = ({ isOpen, onClose, user }) => {
   const dispatch = useDispatch();
@@ -180,6 +180,7 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
               <FloatingLabelInput
                 label="Name"
                 type="text"
+                id="displayName"
                 value={newDisplayName}
                 maxLength={50}
                 onChange={(e) => setNewDisplayName(e.target.value)}
@@ -190,6 +191,7 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
               <FloatingLabelInput
                 label="Bio"
                 type="text"
+                id="bio"
                 value={newBio}
                 maxLength={160}
                 onChange={(e) => setNewBio(e.target.value)}

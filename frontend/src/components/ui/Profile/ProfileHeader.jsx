@@ -1,6 +1,6 @@
 import { BiCalendarAlt } from "react-icons/bi";
 import { useParams } from "react-router-dom";
-import EditProfileModal from "../../func/EditProfileModal.jsx";
+import EditProfileModal from "./EditProfileModal.jsx";
 import { useState } from "react";
 
 const ProfileHeader = ({ user, isOwner }) => {

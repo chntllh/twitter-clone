@@ -7,7 +7,7 @@ import {
   HiOutlineChatBubbleOvalLeft,
   HiOutlineHeart,
 } from "react-icons/hi2";
-import { getRelativeTime } from "../../utils/relativeTime.js";
+import { getRelativeTime } from "../../../utils/relativeTime.js";
 import { useEffect, useRef, useState } from "react";
 import HoverCard from "./HoverCard.jsx";
 

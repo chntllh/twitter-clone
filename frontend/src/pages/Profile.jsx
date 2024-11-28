@@ -4,7 +4,7 @@ import ProfileHeader from "../components/ui/Profile/ProfileHeader.jsx";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ProfileTabs from "../components/ui/Profile/ProfileTabs.jsx";
-import Post from "../components/ui/Post.jsx";
+import Post from "../components/ui/Post/Post.jsx";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user) || {};

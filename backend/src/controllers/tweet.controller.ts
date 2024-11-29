@@ -3,6 +3,7 @@ import { errorHandler } from "../middleware/errorHandler";
 import Tweet from "../models/tweet.model";
 import mongoose, { isValidObjectId, ObjectId } from "mongoose";
 import { InterfaceUser } from "../models/user.model";
+import Follower from "../models/follower.model";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -135,6 +136,42 @@ export const getUserTweets = async (
     );
 
     res.status(200).json(formattedTweets);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserFollowingTweets = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId || !mongoose.isValidObjectId(userId)) {
+      return next(errorHandler(400, "Not valid userId"));
+    }
+
+    const following = await Follower.find({ followerId: userId })
+      .select("userId")
+      .lean();
+    const followingUserIds = following.map((follow) => follow.userId);
+
+    const tweets = await Tweet.find({ userId: { $in: followingUserIds } })
+      .populate<{ userId: InterfaceUser }>(
+        "userId",
+        "_id username displayName avatarUrl"
+      )
+      .sort({ createdAt: -1 })
+      .select("content imageUrl likesCount retweetCount createdAt userId")
+      .lean();
+
+    const formattedTweet: FormattedTweet[] = tweets.map((tweet) =>
+      formatTweet(tweet)
+    );
+
+    res.status(200).json(formattedTweet);
   } catch (error) {
     next(error);
   }

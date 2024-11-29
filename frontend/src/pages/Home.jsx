@@ -2,31 +2,52 @@ import ForYouFollowing from "../components/ui/Home/ForYouFollowing.jsx";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Post from "../components/ui/Post/Post.jsx";
 import TweetBox from "../components/ui/Home/TweetBox.jsx";
+import Posts from "../components/ui/Post/Posts.jsx";
 
 const Home = () => {
   const { currentUser } = useSelector((state) => state.user);
 
-  const [posts, setPosts] = useState([]);
+  const [forYouPosts, setForYouPosts] = useState([]);
+  const [followingPosts, setFollowingPosts] = useState([]);
+
   const [activeTab, setActiveTab] = useState("for-you");
 
   useEffect(() => {
-    const fetchPosts = async () => {
+    if (!currentUser?.userId) return;
+
+    const fetchForYouPosts = async () => {
       try {
         const response = await axios.get("/api/tweet/all");
-        setPosts(response.data);
+        setForYouPosts(response.data);
       } catch (error) {
         console.error("Error fetching posts: ", error);
       }
     };
 
-    fetchPosts();
-  }, []);
+    const fetchFollowingPosts = async () => {
+      try {
+        const response = await axios.get(
+          `/api/tweet/following/${currentUser.userId}`
+        );
+        setFollowingPosts(response.data);
+      } catch (error) {
+        console.error("Error fetching posts: ", error);
+      }
+    };
+
+    if (activeTab === "for-you") {
+      fetchForYouPosts();
+    } else if (activeTab === "following") {
+      fetchFollowingPosts();
+    }
+  }, [currentUser?.userId, activeTab]);
 
   const postTweet = (post) => {
-    setPosts((rest) => [post, ...rest]);
+    setForYouPosts((rest) => [post, ...rest]);
   };
+
+  console.log(forYouPosts, followingPosts);
 
   return (
     <div className="">
@@ -38,10 +59,8 @@ const Home = () => {
         profilePictureUrl={currentUser.avatarUrl}
         onPost={(post) => postTweet(post)}
       />
-
-      {posts.map((post) => (
-        <Post post={post} key={post.tweetId} />
-      ))}
+      {activeTab === "for-you" && <Posts posts={forYouPosts} />}
+      {activeTab === "following" && <Posts posts={followingPosts} />}
     </div>
   );
 };

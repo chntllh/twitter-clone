@@ -1,19 +1,31 @@
-const ForYouFollowing = ({ active }) => {
+const ForYouFollowing = ({ activeTab, setActiveTab }) => {
   return (
-    <div className="hidden md:block">
+    <div className="backdrop-blur-lg">
       <div className="flex w-full h-14 border-b border-gray-600 relative">
-        <div className="flex-1 flex items-center justify-center text-center relative cursor-pointer">
-          For You
-          {active === "for-you" && (
-            <div className="w-20 h-1 bg-blue-500 rounded-full absolute bottom-0"></div>
+        <button
+          key="for-you"
+          className={`flex-1 py-4 text-center relative hover:bg-neutral-900 ${
+            activeTab === "for-you" ? "font-bold" : "text-gray-400"
+          }`}
+          onClick={() => setActiveTab("for-you")}
+        >
+          <span>For you</span>
+          {activeTab === "for-you" && (
+            <div className="absolute bottom-0 left-0 right-0 mx-auto w-16 h-1 bg-blue-500 rounded-full"></div>
           )}
-        </div>
-        <div className="flex-1 flex items-center justify-center text-center relative cursor-pointer">
-          Following
-          {active === "following" && (
-            <div className="w-20 h-1 bg-blue-500 rounded-full absolute bottom-0"></div>
+        </button>
+        <button
+          key="following"
+          className={`flex-1 py-4 text-center relative hover:bg-neutral-900 ${
+            activeTab === "following" ? "font-bold" : "text-gray-400"
+          }`}
+          onClick={() => setActiveTab("following")}
+        >
+          <span>Following</span>
+          {activeTab === "following" && (
+            <div className="absolute bottom-0 left-0 right-0 mx-auto w-16 h-1 bg-blue-500 rounded-full"></div>
           )}
-        </div>
+        </button>
       </div>
     </div>
   );

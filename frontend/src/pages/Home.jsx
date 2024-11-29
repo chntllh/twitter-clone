@@ -9,6 +9,7 @@ const Home = () => {
   const { currentUser } = useSelector((state) => state.user);
 
   const [posts, setPosts] = useState([]);
+  const [activeTab, setActiveTab] = useState("for-you");
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -29,7 +30,9 @@ const Home = () => {
 
   return (
     <div className="">
-      <ForYouFollowing active="for-you" />
+      <div className="sticky top-0 z-10">
+        <ForYouFollowing activeTab={activeTab} setActiveTab={setActiveTab} />
+      </div>
 
       <TweetBox
         profilePictureUrl={currentUser.avatarUrl}

@@ -83,7 +83,6 @@ export const register = async (
       .cookie("access_token", token, {
         httpOnly: true,
         sameSite: "strict",
-        maxAge: 24 * 60 * 60 * 1000,
       })
       .json(userData);
   } catch (error: any) {
@@ -135,7 +134,6 @@ export const login = async (
       .cookie("access_token", token, {
         httpOnly: true,
         sameSite: "strict",
-        maxAge: 24 * 60 * 60 * 1000,
       })
       .json(userData);
   } catch (error) {
@@ -192,7 +190,6 @@ export const google = async (
         .cookie("access_token", token, {
           httpOnly: true,
           sameSite: "strict",
-          maxAge: 24 * 60 * 60 * 1000,
         })
         .json(userData);
     }

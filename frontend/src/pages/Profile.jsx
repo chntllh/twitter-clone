@@ -3,16 +3,35 @@ import { useParams } from "react-router-dom";
 import ProfileHeader from "../components/ui/Profile/ProfileHeader.jsx";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ProfileTabs from "../components/ui/Profile/ProfileTabs.jsx";
 import Post from "../components/ui/Post/Post.jsx";
+import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user) || {};
   const { username } = useParams();
 
   const [user, setUser] = useState({});
-  const [activeTab, setActiveTab] = useState("Tweets");
+  const [activeTab, setActiveTab] = useState("tweets");
   const [posts, setPosts] = useState([]);
+
+  const tabs = [
+    {
+      tab: "tweets",
+      tabName: "Tweets",
+    },
+    {
+      tab: "replies",
+      tabName: "Replies",
+    },
+    {
+      tab: "media",
+      tabName: "Media",
+    },
+    {
+      tab: "likes",
+      tabName: "Likes",
+    },
+  ];
 
   const isOwner = currentUser?.username === username;
 
@@ -49,10 +68,14 @@ const Profile = () => {
 
       {user !== null && (
         <div>
-          <ProfileTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+          <LabelledSelectorTabs
+            tabs={tabs}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+          />
 
           <div>
-            {activeTab === "Tweets" &&
+            {activeTab === "tweets" &&
               posts.map((post) => <Post post={post} key={post.tweetId} />)}
           </div>
         </div>

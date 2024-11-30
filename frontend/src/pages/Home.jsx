@@ -1,9 +1,9 @@
-import ForYouFollowing from "../components/ui/Home/ForYouFollowing.jsx";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TweetBox from "../components/ui/Home/TweetBox.jsx";
 import Posts from "../components/ui/Post/Posts.jsx";
+import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
 
 const Home = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -12,6 +12,17 @@ const Home = () => {
   const [followingPosts, setFollowingPosts] = useState([]);
 
   const [activeTab, setActiveTab] = useState("for-you");
+
+  const tabs = [
+    {
+      tab: "for-you",
+      tabName: "For You",
+    },
+    {
+      tab: "following",
+      tabName: "Following",
+    },
+  ];
 
   useEffect(() => {
     if (!currentUser?.userId) return;
@@ -51,8 +62,8 @@ const Home = () => {
 
   return (
     <div className="">
-      <div className="sticky top-0 z-10">
-        <ForYouFollowing activeTab={activeTab} setActiveTab={setActiveTab} />
+      <div className="sticky top-0 z-10 backdrop-blur-lg">
+        <LabelledSelectorTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
 
       <TweetBox

@@ -2,12 +2,18 @@ import mongoose, { isValidObjectId, ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Follower from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
-import User from "../models/user.model";
+import User, { InterfaceUser } from "../models/user.model";
 
 export interface CustomRequest extends Request {
   user?: {
     id: ObjectId;
   };
+}
+
+interface FormattedRelation {
+  username: string;
+  avatarUrl: string | undefined;
+  displayName: string;
 }
 
 export const test = (req, res) => {
@@ -94,12 +100,22 @@ export const followers = async (
       return next(errorHandler(404, "Invalid userId"));
     }
 
-    const followers = await Follower.find({ userId: userId }).populate(
-      "followerId",
-      "displayName username avatarUrl"
+    const followers = await Follower.find({ userId: userId })
+      .populate<{ followerId: InterfaceUser }>(
+        "followerId",
+        "displayName username avatarUrl"
+      )
+      .lean();
+
+    const formattedFollowers: FormattedRelation[] = followers.map(
+      (follower) => ({
+        username: follower.followerId.username,
+        displayName: follower.followerId.displayName,
+        avatarUrl: follower.followerId.avatarUrl,
+      })
     );
 
-    res.status(200).json(followers);
+    res.status(200).json(formattedFollowers);
   } catch (error) {
     next(error);
   }
@@ -117,12 +133,20 @@ export const following = async (
       return next(errorHandler(404, "Invalid userId"));
     }
 
-    const followers = await Follower.find({ followerId: userId }).populate(
-      "userId",
-      "displayName username avatarUrl"
-    );
+    const follows = await Follower.find({ followerId: userId })
+      .populate<{ userId: InterfaceUser }>(
+        "userId",
+        "displayName username avatarUrl"
+      )
+      .lean();
 
-    res.status(200).json(followers);
+    const formattedFollowings: FormattedRelation[] = follows.map((follow) => ({
+      username: follow.userId.username,
+      displayName: follow.userId.displayName,
+      avatarUrl: follow.userId.avatarUrl,
+    }));
+
+    res.status(200).json(formattedFollowings);
   } catch (error) {
     next(error);
   }

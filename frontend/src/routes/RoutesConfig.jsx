@@ -7,6 +7,7 @@ import PageNotFound from "../pages/PageNotFound";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import Layout from "../layout/Layout";
+import FollowInfo from "../components/ui/Profile/FollowInfo.jsx";
 
 /* eslint-disable react-refresh/only-export-components */
 const Home = lazy(() => import("../pages/Home"));
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
           {
             path: ":username",
             element: <Profile />,
+          },
+          {
+            path: ":username/:followinfo",
+            element: <FollowInfo />,
           },
           {
             path: "settings",

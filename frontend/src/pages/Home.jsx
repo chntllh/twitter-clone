@@ -58,8 +58,6 @@ const Home = () => {
     setForYouPosts((rest) => [post, ...rest]);
   };
 
-  console.log(forYouPosts, followingPosts);
-
   return (
     <div className="">
       <div className="sticky top-0 z-10 backdrop-blur-lg">

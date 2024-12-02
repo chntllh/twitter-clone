@@ -1,9 +1,11 @@
 import { BiCalendarAlt } from "react-icons/bi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import EditProfileModal from "./EditProfileModal.jsx";
 import { useState } from "react";
 
 const ProfileHeader = ({ user, isOwner }) => {
+  const navigate = useNavigate();
+
   const { username } = useParams(null);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -41,7 +43,11 @@ const ProfileHeader = ({ user, isOwner }) => {
         <div className="h-48 bg-neutral-700"></div>
 
         <div className="absolute top-32 left-4 w-32 h-32 rounded-full border-4 border-black overflow-hidden">
-          <img src={user.avatarUrl} alt="Avatar" className="h-32 w-32 object-cover" />
+          <img
+            src={user.avatarUrl}
+            alt="Avatar"
+            className="h-32 w-32 object-cover"
+          />
         </div>
 
         {isOwner && (
@@ -64,14 +70,23 @@ const ProfileHeader = ({ user, isOwner }) => {
             {"Joined " + formattedDate}
           </h3>
 
-          <div className="mt-3 flex gap-4">
-            <div className=" flex gap-1.5">
-              <strong>{user.followingCount}</strong>
-              <p className="text-gray-500">Following</p>
+          <div className="mt-3 mb-2 flex gap-4">
+            <div
+              className=" flex gap-1.5 hover:underline"
+              onClick={() => navigate(`/${username}/following`)}
+            >
+              <span>
+                <strong>{user.followingCount}</strong>
+                <span className="text-gray-400"> Following</span>
+              </span>
             </div>
-            <div className="flex gap-1.5">
-              <strong>{user.followersCount}</strong>
-              <p className="text-gray-500">Followers</p>
+            <div className="flex gap-1.5 hover:underline"
+              onClick={() => navigate(`/${username}/followers`)}
+            >
+              <span>
+                <strong>{user.followersCount}</strong>
+                <span className="text-gray-400"> Followers</span>
+              </span>
             </div>
           </div>
         </div>

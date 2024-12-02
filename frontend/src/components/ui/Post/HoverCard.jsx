@@ -18,7 +18,7 @@ const HoverCard = ({ userId }) => {
       try {
         const [userResponse, followResponse] = await axios.all([
           axios.get(`/api/user/${userId}`),
-          axios.get(`/api/follow/is-following/${userId}`),
+          axios.get(`/api/follow/${userId}/is-following`),
         ]);
         setUser(userResponse.data);
         setIsFollowing(followResponse.data.isFollowing);

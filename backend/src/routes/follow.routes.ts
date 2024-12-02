@@ -14,8 +14,8 @@ const router = Router();
 router.get("/test", test);
 router.post("/follow/:userId", protect, follow);
 router.post("/unfollow/:userId", protect, unfollow);
-router.get("/followers/:userId", protect, followers);
-router.get("/following/:userId", protect, following);
-router.get("/is-following/:userId", protect, isFollowing);
+router.get("/:identifier/followers", protect, followers);
+router.get("/:identifier/following", protect, following);
+router.get("/:identifier/is-following", protect, isFollowing);
 
 export default router;

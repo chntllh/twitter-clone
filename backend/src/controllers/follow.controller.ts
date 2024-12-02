@@ -1,4 +1,4 @@
-import mongoose, { isValidObjectId, ObjectId } from "mongoose";
+import { isValidObjectId, ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Follower from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
@@ -11,9 +11,11 @@ export interface CustomRequest extends Request {
 }
 
 interface FormattedRelation {
+  userId: ObjectId;
   username: string;
   avatarUrl: string | undefined;
   displayName: string;
+  bio?: string;
 }
 
 export const test = (req, res) => {
@@ -94,24 +96,38 @@ export const followers = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !isValidObjectId(userId)) {
-      return next(errorHandler(404, "Invalid userId"));
+    let userId;
+
+    if (!identifier) {
+      return next(errorHandler(404, "No identifier"));
+    }
+
+    if (isValidObjectId(identifier)) {
+      userId = identifier;
+    } else {
+      const user = await User.findOne({ username: identifier });
+      if (!user) {
+        return next(errorHandler(404, "No user"));
+      }
+      userId = user.id;
     }
 
     const followers = await Follower.find({ userId: userId })
       .populate<{ followerId: InterfaceUser }>(
         "followerId",
-        "displayName username avatarUrl"
+        "_id displayName username avatarUrl bio"
       )
       .lean();
 
     const formattedFollowers: FormattedRelation[] = followers.map(
       (follower) => ({
+        userId: follower.followerId._id as ObjectId,
         username: follower.followerId.username,
         displayName: follower.followerId.displayName,
         avatarUrl: follower.followerId.avatarUrl,
+        bio: follower.followerId.bio,
       })
     );
 
@@ -127,23 +143,37 @@ export const following = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(404, "Invalid userId"));
+    let userId;
+
+    if (!identifier) {
+      return next(errorHandler(404, "No identifier"));
+    }
+
+    if (isValidObjectId(identifier)) {
+      userId = identifier;
+    } else {
+      const user = await User.findOne({ username: identifier });
+      if (!user) {
+        return next(errorHandler(404, "No user"));
+      }
+      userId = user.id;
     }
 
     const follows = await Follower.find({ followerId: userId })
       .populate<{ userId: InterfaceUser }>(
         "userId",
-        "displayName username avatarUrl"
+        "_id displayName username avatarUrl bio"
       )
       .lean();
 
     const formattedFollowings: FormattedRelation[] = follows.map((follow) => ({
+      userId: follow.userId._id as ObjectId,
       username: follow.userId.username,
       displayName: follow.userId.displayName,
       avatarUrl: follow.userId.avatarUrl,
+      bio: follow.userId.bio,
     }));
 
     res.status(200).json(formattedFollowings);
@@ -154,10 +184,22 @@ export const following = async (
 
 export const isFollowing = async (req, res, next) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !isValidObjectId(userId)) {
-      return next(errorHandler(404, "Invalid userId"));
+    let userId;
+
+    if (!identifier) {
+      return next(errorHandler(404, "No identifier"));
+    }
+
+    if (isValidObjectId(identifier)) {
+      userId = identifier;
+    } else {
+      const user = await User.findOne({ username: identifier });
+      if (!user) {
+        return next(errorHandler(404, "No user"));
+      }
+      userId = user.id;
     }
 
     if (!req.user) {

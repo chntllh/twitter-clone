@@ -57,6 +57,8 @@ const userSchema = new Schema<InterfaceUser>(
 
 userSchema.index({ username: 1, email: 1 });
 
+userSchema.index({ username: 1 }, { unique: true });
+
 userSchema.index({ createdAt: -1 });
 
 const User: Model<InterfaceUser> = model("User", userSchema);

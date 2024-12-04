@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaXTwitter } from "react-icons/fa6";
 import OAuth from "../components/func/OAuth.jsx";
 import { useDispatch } from "react-redux";
@@ -14,7 +14,7 @@ import {
   signUpStart,
   signUpSuccess,
 } from "../store/reducer/user.reducer.js";
-import axios from "axios";
+import { login, signup } from "../api/api.js";
 
 const SignIn = () => {
   const dispatch = useDispatch();
@@ -30,6 +30,10 @@ const SignIn = () => {
   const [isInfoEntered, setIsInfoEntered] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+
+  const identifierInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+  const passwordInputRef = useRef(null);
 
   const openSignIn = () => {
     setIsSignInOpen(true);
@@ -63,27 +67,16 @@ const SignIn = () => {
       return dispatch(signInFailure("Please fill all the fields"));
     }
 
-    try {
-      dispatch(signInStart());
+    dispatch(signInStart());
 
-      const res = await axios.post("/api/auth/login", {
-        identifier,
-        password,
-      });
-
-      if (res.data.success === false) {
-        dispatch(signInFailure(res.data.message));
-      } else {
+    await login(identifier, password)
+      .then((res) => {
         dispatch(signInSuccess(res.data));
         navigate("/");
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message;
-      dispatch(signInFailure(errorMessage));
-    }
+      })
+      .catch((error) => {
+        dispatch(signInFailure(error.response.data.message));
+      });
   };
 
   const handleSignup = async (e) => {
@@ -92,31 +85,34 @@ const SignIn = () => {
       return dispatch(signUpFailure("Please fill all the fields"));
     }
 
-    try {
-      dispatch(signUpStart());
+    dispatch(signUpStart());
 
-      const res = await axios.post("/api/auth/register", {
-        email,
-        name,
-        password,
-      });
-
-      console.log("Sign up kek");
-
-      if (res.data.success === false) {
-        dispatch(signUpFailure(res.data.message));
-      } else {
+    await signup(email, name, password)
+      .then((res) => {
         dispatch(signUpSuccess(res.data));
         navigate("/");
-      }
-    } catch (error) {
-      const errorMessage =
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message;
-      dispatch(signUpFailure(errorMessage));
-    }
+      })
+      .catch((error) => {
+        dispatch(signUpFailure(error.response.data.message));
+      });
   };
+
+  useEffect(() => {
+    if (isSignInOpen) {
+      if (!isIdentifierEntered && identifierInputRef.current) {
+        identifierInputRef.current.focus();
+      } else if (isIdentifierEntered && passwordInputRef.current) {
+        passwordInputRef.current.focus();
+      }
+    }
+    if (isSignUpOpen) {
+      if (!isInfoEntered && identifierInputRef.current) {
+        identifierInputRef.current.focus();
+      } else if (isInfoEntered && passwordInputRef.current) {
+        passwordInputRef.current.focus();
+      }
+    }
+  }, [isSignInOpen, isIdentifierEntered, isSignUpOpen, isInfoEntered]);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center gap-20">
@@ -180,8 +176,16 @@ const SignIn = () => {
                     <hr className="flex-grow border-gray-600" />
                   </div>
 
-                  <div className="mb-8">
+                  <div
+                    className="mb-8"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setIsIdentifierEntered(true);
+                      }
+                    }}
+                  >
                     <FloatingLabelInput
+                      ref={identifierInputRef}
                       label="Email or username"
                       type="email"
                       value={identifier}
@@ -190,6 +194,7 @@ const SignIn = () => {
                   </div>
 
                   <button
+                    type="submit"
                     onClick={() => setIsIdentifierEntered(true)}
                     className={`w-full px-5 py-2 ${
                       !identifier ? "bg-gray-400" : "bg-white"
@@ -215,8 +220,16 @@ const SignIn = () => {
                     <span className="text-xs">Email</span>
                     {identifier}
                   </div>
-                  <div className="mb-8 flex relative items-center">
+                  <div
+                    className="mb-8 flex relative items-center"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleLogin(e);
+                      }
+                    }}
+                  >
                     <FloatingLabelInput
+                      ref={passwordInputRef}
                       label="Password"
                       type={passwordFieldType}
                       value={password}
@@ -267,16 +280,32 @@ const SignIn = () => {
                   <h1 className="text-4xl font-bold mb-8">
                     Create your account
                   </h1>
-                  <div className="mb-8">
+                  <div
+                    className="mb-8"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        emailInputRef.current.focus();
+                      }
+                    }}
+                  >
                     <FloatingLabelInput
+                      ref={identifierInputRef}
                       label="Name"
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
                   </div>
-                  <div className="mb-8">
+                  <div
+                    className="mb-8"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        setIsInfoEntered(true);
+                      }
+                    }}
+                  >
                     <FloatingLabelInput
+                      ref={emailInputRef}
                       label="Email"
                       type="text"
                       value={email}
@@ -298,8 +327,16 @@ const SignIn = () => {
               ) : (
                 <div className="w-[30rem]">
                   <h1 className="text-4xl font-bold mb-8">Set a password</h1>
-                  <div className="mb-8 flex relative items-center">
+                  <div
+                    className="mb-8 flex relative items-center"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSignup(e);
+                      }
+                    }}
+                  >
                     <FloatingLabelInput
+                      ref={passwordInputRef}
                       label="Password"
                       type={passwordFieldType}
                       value={password}

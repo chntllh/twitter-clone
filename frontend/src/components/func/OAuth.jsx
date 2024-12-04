@@ -3,7 +3,12 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { fireapp } from "../../firebase.js";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { signInFailure, signInSuccess } from "../../store/reducer/user.reducer.js";
+import {
+  signInFailure,
+  signInStart,
+  signInSuccess,
+} from "../../store/reducer/user.reducer.js";
+import { googleLogin } from "../../api/api.js";
 
 const OAuth = () => {
   const auth = getAuth(fireapp);
@@ -11,30 +16,21 @@ const OAuth = () => {
   const navigate = useNavigate();
 
   const handleGoogleClick = async () => {
+    dispatch(signInStart());
+
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
 
-    try {
-      const resultsFromGoogle = await signInWithPopup(auth, provider);
+    const resultsFromGoogle = await signInWithPopup(auth, provider);
 
-      const res = await fetch("/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: resultsFromGoogle.user.displayName,
-          email: resultsFromGoogle.user.email,
-          googlePhotoUrl: resultsFromGoogle.user.photoURL,
-        }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        dispatch(signInSuccess(data));
+    await googleLogin(resultsFromGoogle)
+      .then((res) => {
+        dispatch(signInSuccess(res.data));
         navigate("/");
-      }
-    } catch (error) {
-      dispatch(signInFailure(error))
-    }
+      })
+      .catch((error) => {
+        dispatch(signInFailure(error.response.data.message));
+      });
   };
 
   return (

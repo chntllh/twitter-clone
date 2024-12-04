@@ -16,3 +16,11 @@ export const signup = (email, name, password) => {
     password,
   });
 };
+
+export const googleLogin = ({ user }) => {
+  return apiClient.post("/api/auth/google", {
+    name: user.displayName,
+    email: user.email,
+    googlePhotoUrl: user.photoURL,
+  });
+};

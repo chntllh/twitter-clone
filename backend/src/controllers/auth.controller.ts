@@ -160,7 +160,10 @@ export const google = async (
       const userData = formatUser(user.toObject());
       res
         .status(200)
-        .cookie("access_token", token, { httpOnly: true })
+        .cookie("access_token", token, {
+          httpOnly: true,
+          sameSite: "strict",
+        })
         .json(userData);
     } else {
       const generatedPassword =

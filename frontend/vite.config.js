@@ -1,5 +1,8 @@
 import { defineConfig } from "vite";
+import { config } from "dotenv";
 import react from "@vitejs/plugin-react-swc";
+
+config({ path: "../.env" });
 
 // https://vitejs.dev/config/
 export default defineConfig({

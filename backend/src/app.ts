@@ -24,14 +24,12 @@ app.use(
 app.listen(3000, () => console.log("Server running on port 3000"));
 
 // Routes
-import userRoutes from "./routes/user.routes";
-app.use("/api/user", userRoutes);
 import authRoutes from "./routes/auth.routes";
 app.use("/api/auth", authRoutes);
+import userRoutes from "./routes/user.routes";
+app.use("/api/user", userRoutes);
 import tweetRoutes from "./routes/tweet.routes";
 app.use("/api/tweet", tweetRoutes);
-import followRoutes from "./routes/follow.routes";
-app.use("/api/follow", followRoutes);
 import tweetActionsRoutes from "./routes/tweetActions.routes";
 app.use("/api/actions", tweetActionsRoutes);
 

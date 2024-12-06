@@ -8,9 +8,9 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { fireapp } from "../../../firebase.js";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../../../store/reducer/user.reducer.js";
+import { updateUser } from "../../../api/api.js";
 
 const EditProfileModal = ({ isOpen, onClose, user }) => {
   const dispatch = useDispatch();
@@ -81,25 +81,21 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
     });
   };
 
-  const updateUser = async () => {
-    try {
-      const newData = {
-        ...(newDisplayName !== user.displayName && {
-          displayName: newDisplayName,
-        }),
-        ...(newBio !== user.bio && { bio: newBio }),
-        ...(image && { avatarUrl: await handleUploadImage(image) }),
-      };
-
-      const response = await axios.post("/api/user/update", newData);
-
-      dispatch(signInSuccess(response.data));
+  const handleUpdateUser = async () => {
+    updateUser({
+      ...(newDisplayName !== user.displayName && {
+        displayName: newDisplayName,
+      }),
+      ...(newBio !== user.bio && { bio: newBio }),
+      ...(image && { avatarUrl: await handleUploadImage(image) }),
+    }).then((res) => {
+      dispatch(signInSuccess(res.data));
       handleClearImage();
       onClose();
-    } catch (error) {
+    })
+    .catch((error) => {
       console.error(error);
-      throw new Error("Failed to create post");
-    }
+    });
   };
 
   return (
@@ -121,7 +117,7 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
 
           <button
             className="absolute top-3 right-3 px-5 py-2 rounded-full font-bold bg-white hover:bg-gray-100 text-black"
-            onClick={updateUser}
+            onClick={handleUpdateUser}
           >
             Save
           </button>

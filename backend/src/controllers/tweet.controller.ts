@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose, { ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
-import Tweet from "../models/tweet.model";
-import mongoose, { isValidObjectId, ObjectId } from "mongoose";
 import { InterfaceUser } from "../models/user.model";
+import { resolveUserId } from "../helper/userIdResolver";
+import Tweet from "../models/tweet.model";
 import Follower from "../models/follower.model";
 
 export interface CustomRequest extends Request {
@@ -116,11 +117,9 @@ export const getUserTweets = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(400, "Not valid userId"));
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     const tweets = await Tweet.find({ userId: userId })
       .populate<{ userId: InterfaceUser }>(
@@ -147,11 +146,9 @@ export const getUserFollowingTweets = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !mongoose.isValidObjectId(userId)) {
-      return next(errorHandler(400, "Not valid userId"));
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     const following = await Follower.find({ followerId: userId })
       .select("userId")

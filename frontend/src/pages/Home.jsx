@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import TweetBox from "../components/ui/Home/TweetBox.jsx";
 import Posts from "../components/ui/Post/Posts.jsx";
 import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
+import { getAllTweets, getUserFollowingTweets } from "../api/api.js";
 
 const Home = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -28,23 +28,23 @@ const Home = () => {
     if (!currentUser?.userId) return;
 
     const fetchForYouPosts = async () => {
-      try {
-        const response = await axios.get("/api/tweet/all");
-        setForYouPosts(response.data);
-      } catch (error) {
-        console.error("Error fetching posts: ", error);
-      }
+      getAllTweets()
+        .then((res) => {
+          setForYouPosts(res.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching posts: ", error);
+        });
     };
 
     const fetchFollowingPosts = async () => {
-      try {
-        const response = await axios.get(
-          `/api/tweet/following/${currentUser.userId}`
-        );
-        setFollowingPosts(response.data);
-      } catch (error) {
-        console.error("Error fetching posts: ", error);
-      }
+      getUserFollowingTweets(currentUser.userId)
+        .then((res) => {
+          setFollowingPosts(res.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching posts: ", error);
+        });
     };
 
     if (activeTab === "for-you") {
@@ -61,7 +61,11 @@ const Home = () => {
   return (
     <div className="">
       <div className="sticky top-0 z-10 backdrop-blur-lg">
-        <LabelledSelectorTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
+        <LabelledSelectorTabs
+          tabs={tabs}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+        />
       </div>
 
       <TweetBox

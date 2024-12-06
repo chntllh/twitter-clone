@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { follow, getUserAndIsFollowing, unfollow } from "../../../api/api.js";
 
 const HoverCard = ({ userId }) => {
   const [loading, setLoading] = useState(true);
@@ -14,19 +14,18 @@ const HoverCard = ({ userId }) => {
   const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const [userResponse, followResponse] = await axios.all([
-          axios.get(`/api/user/${userId}`),
-          axios.get(`/api/follow/${userId}/is-following`),
-        ]);
-        setUser(userResponse.data);
-        setIsFollowing(followResponse.data.isFollowing);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+    const fetchUser = () => {
+      getUserAndIsFollowing(userId)
+        .then((res) => {
+          setUser(res.user);
+          setIsFollowing(res.isFollowing.isFollowing);
+        })
+        .catch((error) => {
+          console.error(error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     };
 
     fetchUser();
@@ -34,10 +33,7 @@ const HoverCard = ({ userId }) => {
 
   const handleFollowToggle = async () => {
     try {
-      const endpoint = isFollowing
-        ? `/api/follow/unfollow/${userId}`
-        : `/api/follow/follow/${userId}`;
-      await axios.post(endpoint);
+      isFollowing ? unfollow(userId) : follow(userId);
       setIsFollowing((prev) => !prev);
     } catch (error) {
       console.error(error);

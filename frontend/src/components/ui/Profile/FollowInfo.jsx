@@ -2,8 +2,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import PageNotFound from "../../../pages/PageNotFound.jsx";
 import LabelledSelectorTabs from "../LabelledSelectorTabs.jsx";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import ProfileCard from "./ProfileCard.jsx";
+import { getFollowers, getFollowing } from "../../../api/api.js";
 
 const FollowInfo = () => {
   const { username, followinfo } = useParams();
@@ -25,21 +25,23 @@ const FollowInfo = () => {
 
   useEffect(() => {
     const fetchFollowers = async () => {
-      try {
-        const response = await axios.get(`/api/follow/${username}/followers`);
-        setFollowers(response.data);
-      } catch (error) {
-        console.error("Error fetching followers: ", error);
-      }
+      getFollowers(username)
+        .then((res) => {
+          setFollowers(res.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching followers: ", error);
+        });
     };
 
     const fetchFollowing = async () => {
-      try {
-        const response = await axios.get(`/api/follow/${username}/following`);
-        setFollowing(response.data);
-      } catch (error) {
-        console.error("Error fetching following: ", error);
-      }
+      getFollowing(username)
+        .then((res) => {
+          setFollowing(res.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching followers: ", error);
+        });
     };
 
     if (followinfo === "following") {

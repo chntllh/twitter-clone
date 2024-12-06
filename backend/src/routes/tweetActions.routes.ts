@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { protect } from "../middleware/protect";
 import {
   likeTweet,
   retweetTweet,
@@ -6,7 +7,6 @@ import {
   unlikeTweet,
   unretweetTweet,
 } from "../controllers/tweetActions.controller";
-import { protect } from "../middleware/protect";
 
 const router = Router();
 

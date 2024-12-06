@@ -1,8 +1,9 @@
-import { isValidObjectId, ObjectId } from "mongoose";
+import mongoose, { isValidObjectId, ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Follower from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
 import User, { InterfaceUser } from "../models/user.model";
+import { resolveUserId } from "../helper/userIdResolver";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -28,11 +29,9 @@ export const follow = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !isValidObjectId(userId)) {
-      return next(errorHandler(404, "Invalid userId"));
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     if (!req.user) {
       return next(errorHandler(400, "No user"));
@@ -62,11 +61,9 @@ export const unfollow = async (
   next: NextFunction
 ) => {
   try {
-    const { userId } = req.params;
+    const { identifier } = req.params;
 
-    if (!userId || !isValidObjectId(userId)) {
-      return next(errorHandler(404, "Invalid userId"));
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     if (!req.user) {
       return next(errorHandler(400, "No user"));
@@ -98,21 +95,7 @@ export const followers = async (
   try {
     const { identifier } = req.params;
 
-    let userId;
-
-    if (!identifier) {
-      return next(errorHandler(404, "No identifier"));
-    }
-
-    if (isValidObjectId(identifier)) {
-      userId = identifier;
-    } else {
-      const user = await User.findOne({ username: identifier });
-      if (!user) {
-        return next(errorHandler(404, "No user"));
-      }
-      userId = user.id;
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     const followers = await Follower.find({ userId: userId })
       .populate<{ followerId: InterfaceUser }>(
@@ -145,21 +128,7 @@ export const following = async (
   try {
     const { identifier } = req.params;
 
-    let userId;
-
-    if (!identifier) {
-      return next(errorHandler(404, "No identifier"));
-    }
-
-    if (isValidObjectId(identifier)) {
-      userId = identifier;
-    } else {
-      const user = await User.findOne({ username: identifier });
-      if (!user) {
-        return next(errorHandler(404, "No user"));
-      }
-      userId = user.id;
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     const follows = await Follower.find({ followerId: userId })
       .populate<{ userId: InterfaceUser }>(
@@ -186,21 +155,7 @@ export const isFollowing = async (req, res, next) => {
   try {
     const { identifier } = req.params;
 
-    let userId;
-
-    if (!identifier) {
-      return next(errorHandler(404, "No identifier"));
-    }
-
-    if (isValidObjectId(identifier)) {
-      userId = identifier;
-    } else {
-      const user = await User.findOne({ username: identifier });
-      if (!user) {
-        return next(errorHandler(404, "No user"));
-      }
-      userId = user.id;
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
 
     if (!req.user) {
       return next(errorHandler(400, "No user"));

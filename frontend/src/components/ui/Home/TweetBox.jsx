@@ -14,8 +14,8 @@ import {
   BiSolidFileGif,
 } from "react-icons/bi";
 import { MdClose } from "react-icons/md";
-import axios from "axios";
 import { fireapp } from "../../../firebase.js";
+import { postTweet } from "../../../api/api.js";
 
 const TweetBox = ({ profilePictureUrl, onPost }) => {
   const [text, setText] = useState("");
@@ -78,40 +78,31 @@ const TweetBox = ({ profilePictureUrl, onPost }) => {
     });
   };
 
-  const createPost = async (postData) => {
-    try {
-      const response = await axios.post("/api/tweet", postData);
-      return response.data;
-    } catch (error) {
-      throw new Error("Failed to create post", error);
-    }
-  };
-
   const handlePost = async () => {
     if (!text.trim() && !image) {
       setError("Cannot post empty content!");
       return;
     }
 
-    try {
-      setError(null);
+    setError(null);
 
-      let uploadedImageUrl = "";
-      if (image) {
-        uploadedImageUrl = await handleUploadImage();
-      }
-
-      const newPost = await createPost({
-        content: text,
-        imageUrl: uploadedImageUrl,
-      });
-
-      onPost(newPost);
-      resetState();
-    } catch (error) {
-      console.error("Error posting tweet:", error);
-      setError("Failed to post tweet.");
+    let uploadedImageUrl = "";
+    if (image) {
+      uploadedImageUrl = await handleUploadImage();
     }
+
+    postTweet({
+      content: text,
+      imageUrl: uploadedImageUrl,
+    })
+      .then((res) => {
+        onPost(res.data);
+        resetState();
+      })
+      .catch((error) => {
+        console.error("Error posting tweet:", error);
+        setError("Failed to post tweet.");
+      });
   };
 
   const resetState = () => {

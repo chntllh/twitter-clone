@@ -2,9 +2,9 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import ProfileHeader from "../components/ui/Profile/ProfileHeader.jsx";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Post from "../components/ui/Post/Post.jsx";
 import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
+import { getUser, getUserTweets } from "../api/api.js";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user) || {};
@@ -36,27 +36,29 @@ const Profile = () => {
   const isOwner = currentUser?.username === username;
 
   useEffect(() => {
-    const fetchUserPosts = async (userId) => {
-      try {
-        const response = await axios.get(`/api/tweet/user/${userId}`);
-        setPosts(response.data);
-      } catch (error) {
-        console.error("Error fetching posts: ", error);
-      }
+    const fetchUserPosts = (userId) => {
+      getUserTweets(userId)
+        .then((res) => {
+          setPosts(res.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching posts: ", error);
+        });
     };
 
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`/api/user/${username}`);
-        setUser(response.data);
-        fetchUserPosts(response.data.userId);
-      } catch (error) {
-        if (error.response && error.response.data.statusCode === 404) {
-          setUser(null);
-        } else {
-          console.error(error);
-        }
-      }
+    const fetchUser = () => {
+      getUser(username)
+        .then((res) => {
+          setUser(res.data);
+          fetchUserPosts(res.data.userId);
+        })
+        .catch((error) => {
+          if (error.response && error.response.data.statusCode === 404) {
+            setUser(null);
+          } else {
+            console.error(error);
+          }
+        });
     };
 
     fetchUser();

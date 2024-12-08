@@ -4,11 +4,26 @@ import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
+const logErrorAndExit = (message) => {
+  console.error("\x1b[31m%s\x1b[0m", message);
+  process.exit(1);
+};
+
+const validateEnv = () => {
+  if (!process.env.JWT_SECRET) {
+    logErrorAndExit("JWT_SECRET is missing in the environment variables.");
+  }
+  if (!process.env.MONGO_URI) {
+    logErrorAndExit("MONGO_URI is missing in the environment variables.");
+  }
+};
+
 dotenv.config({ path: "../.env" });
+validateEnv();
 
 mongoose
   .connect(process.env.MONGO_URI as string)
-  .then(() => console.log("MongoDB connected!"))
+  .then(() => console.log("\x1b[33m%s\x1b[0m", "MongoDB connected!"))
   .catch((err: any) => console.log(err));
 
 const app = express();
@@ -21,7 +36,9 @@ app.use(
   })
 );
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+app.listen(3000, () =>
+  console.log("\x1b[33m%s\x1b[0m", "Server running on port 3000")
+);
 
 // Routes
 import authRoutes from "./routes/auth.routes";

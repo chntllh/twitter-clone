@@ -68,13 +68,9 @@ export const register = async (
       passwordHash: hashedPassword,
     });
 
-    if (!process.env.JWT_SECRET) {
-      return next(errorHandler(500, "Internal server error"));
-    }
-
     await newUser.save();
 
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET!);
 
     const userData: FormattedUser = formatUser(newUser.toObject());
 
@@ -83,6 +79,7 @@ export const register = async (
       .cookie("access_token", token, {
         httpOnly: true,
         sameSite: "strict",
+        maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);
   } catch (error: any) {
@@ -122,10 +119,7 @@ export const login = async (
       return next(errorHandler(400, "Invalid email/username or password"));
     }
 
-    if (!process.env.JWT_SECRET) {
-      return next(errorHandler(500, "Internal server error"));
-    }
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET!);
 
     const userData: FormattedUser = formatUser(validUser.toObject());
 
@@ -134,6 +128,7 @@ export const login = async (
       .cookie("access_token", token, {
         httpOnly: true,
         sameSite: "strict",
+        maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);
   } catch (error) {
@@ -148,21 +143,18 @@ export const google = async (
 ) => {
   const { email, name, googlePhotoUrl } = req.body;
 
-  if (!process.env.JWT_SECRET) {
-    return next(errorHandler(500, "Internal server error"));
-  }
-
   try {
     const user = await User.findOne({ email });
 
     if (user) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!);
       const userData = formatUser(user.toObject());
       res
         .status(200)
         .cookie("access_token", token, {
           httpOnly: true,
           sameSite: "strict",
+          maxAge: 14 * 24 * 60 * 60 * 1000,
         })
         .json(userData);
     } else {
@@ -184,7 +176,7 @@ export const google = async (
 
       await newUser.save();
 
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET!);
 
       const userData: FormattedUser = formatUser(newUser.toObject());
 
@@ -193,6 +185,7 @@ export const google = async (
         .cookie("access_token", token, {
           httpOnly: true,
           sameSite: "strict",
+          maxAge: 14 * 24 * 60 * 60 * 1000,
         })
         .json(userData);
     }

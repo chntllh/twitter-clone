@@ -173,10 +173,7 @@ export const updateUser = async (
 
     await user.save();
 
-    if (!process.env.JWT_SECRET) {
-      return next(errorHandler(500, "Internal server error"));
-    }
-    const token = sign({ id: user.id }, process.env.JWT_SECRET);
+    const token = sign({ id: user.id }, process.env.JWT_SECRET!);
 
     const userData: FormattedUser = formatUser(user);
 

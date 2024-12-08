@@ -11,7 +11,6 @@ export const protect = (
   res: Response,
   next: NextFunction
 ) => {
-  // const token = req.cookies.access_token;
   const token =
     req.cookies.access_token || req.headers.authorization?.split(" ")[1];
 
@@ -19,14 +18,9 @@ export const protect = (
     return next(errorHandler(401, "Unauthorized: No token provided"));
   }
 
-  const jwtSecret = process.env.JWT_SECRET;
-  if (!jwtSecret) {
-    return next(errorHandler(500, "Internal server error: Missing JWT secret"));
-  }
-
   jwt.verify(
     token,
-    jwtSecret,
+    process.env.JWT_SECRET!,
     (err: jwt.VerifyErrors | null, user: JwtPayload | string | undefined) => {
       if (err) {
         return next(

@@ -1,6 +1,7 @@
 import {
   HiArrowPathRoundedSquare,
   HiEllipsisHorizontal,
+  HiHeart,
   HiMiniArrowUpTray,
   HiOutlineBars3CenterLeft,
   HiOutlineBookmark,
@@ -10,6 +11,7 @@ import {
 import { getRelativeTime } from "../../../utils/relativeTime.js";
 import { useEffect, useRef, useState } from "react";
 import HoverCard from "./HoverCard.jsx";
+import { likeTweet, unlikeTweet } from "../../../api/api.js";
 
 const Post = ({ post }) => {
   const {
@@ -21,11 +23,15 @@ const Post = ({ post }) => {
     imageUrl,
     commentsCount = 0,
     retweetCount = 0,
-    likesCount = 0,
+    likesCount: initialLikesCount = 0,
     sharesCount = 0,
     userId,
+    tweetId,
+    liked: initialLiked = false,
   } = post;
 
+  const [likesCount, setLikesCount] = useState(initialLikesCount);
+  const [liked, setLiked] = useState(initialLiked);
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -54,6 +60,28 @@ const Post = ({ post }) => {
       if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     };
   }, []);
+
+  const toggleLike = () => {
+    if (liked) {
+      unlikeTweet(tweetId)
+        .then(() => {
+          setLikesCount((prev) => prev - 1);
+          setLiked(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      likeTweet(tweetId)
+        .then(() => {
+          setLikesCount((prev) => prev + 1);
+          setLiked(true);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
 
   return (
     <div className="flex p-4 border-b border-gray-600 relative">
@@ -106,30 +134,38 @@ const Post = ({ post }) => {
             <img
               className="max-h-[600px] max-w-full object-cover mx-auto border-2 border-gray-300 rounded-2xl"
               src={imageUrl}
-              alt="Post"
             />
           </div>
         )}
 
         {/* Post Actions: commentsCount, retweetCount, likesCount, etc. */}
         <div className="w-full flex pt-3 justify-between items-center text-xl text-gray-400">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiOutlineChatBubbleOvalLeft />
             <div className="text-sm">{commentsCount}</div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiArrowPathRoundedSquare />
             <div className="text-sm">{retweetCount}</div>
           </div>
-          <div className="flex items-center gap-1">
-            <HiOutlineHeart />
+          <div
+            className="flex items-center gap-1 hover:cursor-pointer"
+            onClick={toggleLike}
+          >
+            {liked ? (
+              <div className="text-red-400">
+                <HiHeart />
+              </div>
+            ) : (
+              <HiOutlineHeart />
+            )}
             <div className="text-sm">{likesCount}</div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiOutlineBars3CenterLeft />
             <div className="text-sm">{sharesCount}</div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiOutlineBookmark />
             <HiMiniArrowUpTray />
           </div>

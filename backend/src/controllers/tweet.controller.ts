@@ -5,6 +5,7 @@ import { InterfaceUser } from "../models/user.model";
 import { resolveUserId } from "../helper/userIdResolver";
 import Tweet from "../models/tweet.model";
 import Follower from "../models/follower.model";
+import Like from "../models/like.model";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -101,9 +102,13 @@ export const getAllTweets = async (
       .select("content imageUrl likesCount retweetCount createdAt userId")
       .lean();
 
-    const formattedTweets: FormattedTweet[] = tweets.map((tweet) =>
-      formatTweet(tweet)
-    );
+    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
+    const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
+
+    const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
+      ...formatTweet(tweet),
+      liked: userLikes.has(tweet._id.toString()),
+    }));
 
     res.status(200).json(formattedTweets);
   } catch (error) {
@@ -112,7 +117,7 @@ export const getAllTweets = async (
 };
 
 export const getUserTweets = async (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -130,9 +135,13 @@ export const getUserTweets = async (
       .select("content imageUrl likesCount retweetCount createdAt userId")
       .lean();
 
-    const formattedTweets: FormattedTweet[] = tweets.map((tweet) =>
-      formatTweet(tweet)
-    );
+    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
+    const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
+
+    const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
+      ...formatTweet(tweet),
+      liked: userLikes.has(tweet._id.toString()),
+    }));
 
     res.status(200).json(formattedTweets);
   } catch (error) {
@@ -164,11 +173,15 @@ export const getUserFollowingTweets = async (
       .select("content imageUrl likesCount retweetCount createdAt userId")
       .lean();
 
-    const formattedTweet: FormattedTweet[] = tweets.map((tweet) =>
-      formatTweet(tweet)
-    );
+      const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
+      const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
+  
+      const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
+        ...formatTweet(tweet),
+        liked: userLikes.has(tweet._id.toString()),
+      }));
 
-    res.status(200).json(formattedTweet);
+    res.status(200).json(formattedTweets);
   } catch (error) {
     next(error);
   }

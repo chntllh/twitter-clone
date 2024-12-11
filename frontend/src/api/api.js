@@ -83,3 +83,11 @@ export const getAllTweets = () => {
 export const getUserFollowingTweets = (userId) => {
   return apiClient.get(`/api/user/${userId}/followingtweets`);
 };
+
+export const likeTweet = (tweetId) => {
+  return apiClient.post(`/api/tweet/${tweetId}/like`);
+};
+
+export const unlikeTweet = (tweetId) => {
+  return apiClient.post(`/api/tweet/${tweetId}/unlike`);
+};

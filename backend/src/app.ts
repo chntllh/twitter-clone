@@ -47,8 +47,6 @@ import userRoutes from "./routes/user.routes";
 app.use("/api/user", userRoutes);
 import tweetRoutes from "./routes/tweet.routes";
 app.use("/api/tweet", tweetRoutes);
-import tweetActionsRoutes from "./routes/tweetActions.routes";
-app.use("/api/actions", tweetActionsRoutes);
 
 // Middleware
 app.use(

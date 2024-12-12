@@ -46,10 +46,10 @@ const Sidebar = () => {
 
   return (
     <div className="sticky top-0 hidden sm:block h-screen">
-      <div className="flex flex-col h-full lg:w-[90%] gap-2 items-center lg:items-start">
-        <div className="ml-1 lg:ml-2 mt-6 lg:mt-4">
-          <FaXTwitter className="hidden lg:block" size={48} />
-          <FaXTwitter className="block lg:hidden" size={32} />
+      <div className="flex flex-col h-full xl:w-[90%] gap-2 items-center xl:items-start">
+        <div className="ml-1 xl:ml-2 mt-6 xl:mt-4">
+          <FaXTwitter className="hidden xl:block" size={48} />
+          <FaXTwitter className="block xl:hidden" size={32} />
         </div>
 
         <SidebarNavigationButton
@@ -78,19 +78,19 @@ const Sidebar = () => {
           icon={<BiSolidCog />}
         />
 
-        <div className="mt-auto mb-6 lg:mb-12">
+        <div className="mt-auto mb-6 xl:mb-12">
           <div className="relative inline-block">
             <div
               ref={profileRef}
               onClick={() => setShowDialog((prev) => !prev)}
-              className="gap-3 lg:ml-3 flex flex-row justify-start items-center cursor-pointer hover:bg-neutral-900 hover:rounded-full"
+              className="gap-3 xl:ml-3 flex flex-row justify-start items-center cursor-pointer hover:bg-neutral-900 hover:rounded-full"
             >
               <img
-                className="w-10 lg:w-12 h-10 lg:h-12 rounded-full object-cover"
+                className="w-10 xl:w-12 h-10 xl:h-12 rounded-full object-cover"
                 src={currentUser.avatarUrl}
                 alt={currentUser.displayName}
               />
-              <div className="hidden lg:block">
+              <div className="hidden xl:block">
                 <h1>{currentUser.displayName}</h1>
                 <p>@{currentUser.username}</p>
               </div>
@@ -99,7 +99,7 @@ const Sidebar = () => {
             {showDialog && (
               <div
                 ref={dialogRef}
-                className="absolute bottom-full left-0 mb-2 w-52 bg-black border border-gray-600 rounded-lg z-10"
+                className="absolute bottom-full left-0 mb-2 w-52 bg-black border border-gray-600 rounded-xl z-10"
                 style={{
                   boxShadow: "0px 0px 6px rgba(75, 85, 99, 1)",
                 }}

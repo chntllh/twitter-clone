@@ -16,6 +16,7 @@ import {
 import { MdClose } from "react-icons/md";
 import { fireapp } from "../../../firebase.js";
 import { postTweet } from "../../../api/api.js";
+import { FormatContentWithHashtags } from "../../func/FormatContentWithHashtags.jsx";
 
 const TweetBox = ({ profilePictureUrl, onPost }) => {
   const [text, setText] = useState("");
@@ -96,8 +97,8 @@ const TweetBox = ({ profilePictureUrl, onPost }) => {
       imageUrl: uploadedImageUrl,
     })
       .then((res) => {
-        onPost(res.data);
         resetState();
+        onPost(res.data);
       })
       .catch((error) => {
         console.error("Error posting tweet:", error);
@@ -128,15 +129,24 @@ const TweetBox = ({ profilePictureUrl, onPost }) => {
 
         {/* Textarea and Icons */}
         <div className="flex flex-col w-full gap-3">
-          <textarea
-            ref={textAreaRef}
-            className="text-2xl text-white bg-black outline-none h-auto w-full resize-none"
-            rows="1"
-            value={text}
-            onChange={handleTextChange}
-            maxLength={256}
-            placeholder="What is happening?!"
-          />
+          {/* Render Hashtags */}
+          <div className="relative">
+            {/* Render the formatted hashtags as overlay */}
+            <div className="text-2xl text-white pointer-events-none absolute inset-0 w-full whitespace-pre-wrap break-words">
+              {FormatContentWithHashtags(text)}
+            </div>
+
+            {/* Editable textarea */}
+            <textarea
+              ref={textAreaRef}
+              className="text-2xl caret-white bg-transparent text-transparent outline-none scrollbar-none resize-none w-full"
+              rows="1"
+              value={text}
+              onChange={handleTextChange}
+              maxLength={256}
+              placeholder="What is happening?!"
+            />
+          </div>
 
           {/* Image Preview */}
           {imagePreview && (

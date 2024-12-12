@@ -3,6 +3,7 @@ import { Document, Model, model, Schema } from "mongoose";
 export interface InterfaceTweetHashtag extends Document {
   tweetId: Schema.Types.ObjectId;
   hashtagId: Schema.Types.ObjectId;
+  createdAt: Date;
 }
 
 const tweetHashtagSchema = new Schema<InterfaceTweetHashtag>({
@@ -17,6 +18,10 @@ const tweetHashtagSchema = new Schema<InterfaceTweetHashtag>({
     ref: "Hashtag",
     required: true,
     index: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 

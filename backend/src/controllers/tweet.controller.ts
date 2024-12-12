@@ -6,6 +6,9 @@ import { resolveUserId } from "../helper/userIdResolver";
 import Tweet from "../models/tweet.model";
 import Follower from "../models/follower.model";
 import Like from "../models/like.model";
+import { extractHashtags } from "../helper/extractHashtags";
+import Hashtag from "../models/hashtag.model";
+import TweetHashtag from "../models/tweet-hashtag.model";
 
 export interface CustomRequest extends Request {
   user?: {
@@ -67,6 +70,23 @@ export const postTweet = async (
   try {
     const tweet = new Tweet(tweetData);
     await tweet.save();
+
+    const hashtags = extractHashtags(content);
+
+    for (const tag of hashtags) {
+      let hashtagDoc = await Hashtag.findOne({ hashtag: tag });
+
+      if (!hashtagDoc) {
+        hashtagDoc = new Hashtag({ hashtag: tag });
+        await hashtagDoc.save();
+      }
+
+      const tweetHashtag = new TweetHashtag({
+        tweetId: tweet._id,
+        hashtagId: hashtagDoc._id,
+      });
+      await tweetHashtag.save();
+    }
 
     const populatedTweet = await Tweet.findById(tweet._id)
       .populate<{ userId: InterfaceUser }>(
@@ -173,13 +193,13 @@ export const getUserFollowingTweets = async (
       .select("content imageUrl likesCount retweetCount createdAt userId")
       .lean();
 
-      const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
-      const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
-  
-      const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
-        ...formatTweet(tweet),
-        liked: userLikes.has(tweet._id.toString()),
-      }));
+    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
+    const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
+
+    const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
+      ...formatTweet(tweet),
+      liked: userLikes.has(tweet._id.toString()),
+    }));
 
     res.status(200).json(formattedTweets);
   } catch (error) {

@@ -1,11 +1,11 @@
 import { Document, Model, model, Schema } from "mongoose";
 
 export interface InterfaceHashtag extends Document {
-  name: String;
+  hashtag: String;
 }
 
 const hashtagSchema = new Schema<InterfaceHashtag>({
-  name: {
+  hashtag: {
     type: String,
     unique: true,
     required: true,
@@ -13,7 +13,7 @@ const hashtagSchema = new Schema<InterfaceHashtag>({
   },
 });
 
-hashtagSchema.index({ name: 1 }, { unique: true });
+hashtagSchema.index({ hashtag: 1 }, { unique: true });
 
 const Hashtag: Model<InterfaceHashtag> = model("Hashtag", hashtagSchema);
 

@@ -8,10 +8,11 @@ import {
   HiOutlineChatBubbleOvalLeft,
   HiOutlineHeart,
 } from "react-icons/hi2";
-import { getRelativeTime } from "../../../utils/relativeTime.js";
 import { useEffect, useRef, useState } from "react";
 import HoverCard from "./HoverCard.jsx";
 import { likeTweet, unlikeTweet } from "../../../api/api.js";
+import { getRelativeTime } from "../../../utils/relativeTime.js";
+import { FormatContentWithHashtags } from "../../func/FormatContentWithHashtags.jsx";
 
 const Post = ({ post }) => {
   const {
@@ -84,9 +85,9 @@ const Post = ({ post }) => {
   };
 
   return (
-    <div className="flex p-4 border-b border-gray-600 relative">
+    <div className="flex p-4 gap-2 border-b max-w-full border-gray-600">
       <div
-        className="relative w-16 h-16 cursor-pointer"
+        className="relative w-16 h-16 cursor-pointer flex-shrink-0"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -109,7 +110,7 @@ const Post = ({ post }) => {
         )}
       </div>
 
-      <div className="w-full px-2">
+      <div className="w-full overflow-auto">
         {/* Header: displayName, username, and Options */}
         <div className="flex justify-between">
           <div className="flex gap-1">
@@ -124,8 +125,8 @@ const Post = ({ post }) => {
         </div>
 
         {/* Post Text */}
-        <div className="py-2">
-          <p>{content}</p>
+        <div className="py-2 whitespace-pre-wrap break-words">
+          {FormatContentWithHashtags(content)}
         </div>
 
         {/* Post Image (if available) */}

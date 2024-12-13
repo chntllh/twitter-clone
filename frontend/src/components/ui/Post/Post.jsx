@@ -35,6 +35,7 @@ const Post = ({ post }) => {
   const [liked, setLiked] = useState(initialLiked);
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const visibleTimeoutRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
@@ -126,8 +127,21 @@ const Post = ({ post }) => {
 
         {/* Post Text */}
         <div className="py-2 whitespace-pre-wrap break-words">
-          {FormatContentWithHashtags(content)}
+          <div className={`${isExpanded ? "" : "line-clamp-4"}`}>
+            {FormatContentWithHashtags(content)}
+          </div>
+          {content.split("\n").length > 4 && (
+            <button
+              onClick={() => setIsExpanded((prev) => !prev)}
+              className="text-blue-500 hover:underline mt-2"
+            >
+              {isExpanded ? "Show Less" : "Show More"}
+            </button>
+          )}
         </div>
+        {/* <div className="py-2 whitespace-pre-wrap break-words">
+          {FormatContentWithHashtags(content)}
+        </div> */}
 
         {/* Post Image (if available) */}
         {imageUrl && (

@@ -60,7 +60,7 @@ const Home = () => {
 
   return (
     <div className="">
-      <div className="sticky top-0 z-10 backdrop-blur-lg">
+      <div className="sticky top-0 z-10 backdrop-blur-lg bg-black bg-opacity-30">
         <LabelledSelectorTabs
           tabs={tabs}
           activeTab={activeTab}

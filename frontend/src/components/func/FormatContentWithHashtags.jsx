@@ -18,7 +18,7 @@ export const FormatContentWithHashtags = (text) => {
         <span
           key={`hashtag-${index}`}
           className="text-blue-500 hover:underline cursor-pointer"
-          onClick={() => navigate(`/search?q=${hashtags[index].slice(1)}`)}
+          onClick={() => navigate(`/search?q=${hashtags[index].slice(1)}&p=latest`)}
         >
           {hashtags[index]}
         </span>

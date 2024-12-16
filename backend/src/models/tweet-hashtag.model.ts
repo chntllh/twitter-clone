@@ -26,6 +26,7 @@ const tweetHashtagSchema = new Schema<InterfaceTweetHashtag>({
 });
 
 tweetHashtagSchema.index({ tweetId: 1, hashtagId: 1 });
+tweetHashtagSchema.index({ hashtagId: 1 });
 
 const TweetHashtag: Model<InterfaceTweetHashtag> = model(
   "TweetHashtag",

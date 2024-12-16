@@ -1,17 +1,26 @@
-import { useState } from "react";
-import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
-import ScrollTest from "../components/ui/ScrollTest.jsx";
+import { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
+import { useLocation, useNavigate } from "react-router-dom";
+import ScrollTest from "../components/ui/ScrollTest.jsx";
+import { getHashtagTweets } from "../api/api.js";
+import Posts from "../components/ui/Post/Posts.jsx";
 
 const Explore = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState("for-you");
   const [isFocused, setIsFocused] = useState(false);
-  const [search, setSearch] = useState("");
 
-  const tabs = [
+  const [search, setSearch] = useState("");
+  const [query, setQuery] = useState("");
+
+  const [activeExploreTab, setActiveExploreTab] = useState("for-you");
+  const [activeSearchTab, setActiveSearchTab] = useState("latest");
+
+  const [searchPosts, setSearchPosts] = useState([]);
+
+  const exploreTab = [
     {
       tab: "for-you",
       tabName: "For You",
@@ -34,9 +43,56 @@ const Explore = () => {
     },
   ];
 
+  const searchTabs = [
+    {
+      tab: "top",
+      tabName: "Top",
+    },
+    {
+      tab: "latest",
+      tabName: "Latest",
+    },
+    {
+      tab: "people",
+      tabName: "People",
+    },
+    {
+      tab: "media",
+      tabName: "Media",
+    },
+    {
+      tab: "lists",
+      tabName: "Lists",
+    },
+  ];
+
+  useEffect(() => {
+    if (location.pathname === "/search") {
+      const searchParams = new URLSearchParams(location.search);
+      const searchQuery = searchParams.get("q");
+      const searchType = searchParams.get("p");
+      setSearch(searchQuery || "");
+      setQuery(searchQuery);
+      setActiveSearchTab(searchType || "latest");
+    }
+  }, [location, location.search]);
+
+  useEffect(() => {
+    if (query) {
+      getHashtagTweets(query)
+        .then((res) => {
+          setSearchPosts(res.data);
+        })
+        .catch((error) => {
+          setSearchPosts([]);
+          console.error("Error fetching posts: ", error);
+        });
+    }
+  }, [query]);
+
   const handleSearch = () => {
     if (!search || search === "") return;
-    navigate(`/search?q=${search}`);
+    navigate(`/search?q=${search}&p=${activeSearchTab}`);
   };
 
   return (
@@ -67,19 +123,40 @@ const Explore = () => {
                   handleSearch();
                 }
               }}
-              className="w-full pl-20 pr-2 text-2xl bg-transparent outline-none"
+              className="w-full pl-16 pr-2 text-2xl bg-transparent outline-none"
             />
           </div>
         </div>
 
-        <LabelledSelectorTabs
-          tabs={tabs}
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-        />
+        {location.pathname === "/explore" && (
+          <LabelledSelectorTabs
+            tabs={exploreTab}
+            activeTab={activeExploreTab}
+            setActiveTab={setActiveExploreTab}
+          />
+        )}
+
+        {location.pathname === "/search" && (
+          <LabelledSelectorTabs
+            tabs={searchTabs}
+            activeTab={activeSearchTab}
+            setActiveTab={(tab) => {
+              navigate(`/search?q=${search}&p=${tab}`);
+            }}
+          />
+        )}
       </div>
 
-      <ScrollTest />
+      {location.pathname === "/explore" && <ScrollTest />}
+
+      {location.pathname === "/search" &&
+        (searchPosts.length > 0 ? (
+          <Posts posts={searchPosts} />
+        ) : (
+          <div className="p-3 mt-20">
+            <h1 className="text-4xl text-center">No posts found</h1>
+          </div>
+        ))}
     </div>
   );
 };

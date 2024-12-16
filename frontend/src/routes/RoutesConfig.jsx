@@ -16,7 +16,6 @@ const Notifications = lazy(() => import("../pages/Notifications"));
 const Profile = lazy(() => import("../pages/Profile"));
 const Settings = lazy(() => import("../pages/Settings"));
 const SignIn = lazy(() => import("../pages/SignIn"));
-const Search = lazy(() => import("../pages/Search.jsx"));
 /* eslint-enable react-refresh/only-export-components */
 
 const router = createBrowserRouter([
@@ -38,7 +37,7 @@ const router = createBrowserRouter([
           },
           {
             path: "search",
-            element: <Search />,
+            element: <Explore />,
           },
           {
             path: "notifications",

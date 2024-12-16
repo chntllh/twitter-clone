@@ -91,3 +91,8 @@ export const likeTweet = (tweetId) => {
 export const unlikeTweet = (tweetId) => {
   return apiClient.post(`/api/tweet/${tweetId}/unlike`);
 };
+
+// Search
+export const getHashtagTweets = (hashtag) => {
+  return apiClient.get(`/api/search/hashtagtweets/${hashtag}`);
+};

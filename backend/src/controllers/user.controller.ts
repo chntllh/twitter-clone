@@ -1,61 +1,28 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
-import { isValidObjectId, ObjectId } from "mongoose";
+import { isValidObjectId, Types } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import { compare, hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
-
-export interface CustomRequest extends Request {
-  user?: {
-    id: ObjectId;
-  };
-}
-
-interface FormattedUser {
-  userId: string;
-  username: string;
-  displayName: string;
-  bio: string | undefined;
-  avatarUrl: string;
-  followersCount: number;
-  followingCount: number;
-  createdAt: Date;
-}
-
-const formatUser = (user: any): FormattedUser => ({
-  userId: user._id,
-  username: user.username,
-  displayName: user.displayName,
-  bio: user.bio,
-  avatarUrl: user.avatarUrl,
-  followersCount: user.followersCount,
-  followingCount: user.followingCount,
-  createdAt: user.createdAt,
-});
-
-export const test = (req: Request, res: Response) => {
-  res.json({ message: "API is working!" });
-};
+import { FormattedUser } from "../types/user.interface";
+import { formatUser } from "../helper/formatUser";
+import { CustomRequest } from "../types/request.interface";
 
 export const getUser = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { identifier } = req.params;
-
-    let query = {};
 
     if (!identifier) {
       return next(errorHandler(404, "No identifier"));
     }
 
-    if (isValidObjectId(identifier)) {
-      query = { _id: identifier };
-    } else {
-      query = { username: identifier };
-    }
+    let query = isValidObjectId(identifier)
+      ? { _id: identifier }
+      : { username: identifier };
 
     const user = await User.findOne(query);
 
@@ -63,9 +30,7 @@ export const getUser = async (
       return next(errorHandler(404, "No user found"));
     }
 
-    const formattedUser: FormattedUser = formatUser(user);
-
-    res.status(200).json(formattedUser);
+    res.status(200).json(formatUser(user));
   } catch (error) {
     next(error);
   }
@@ -75,13 +40,13 @@ export const updateUser = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   if (!req.user) {
     return next(errorHandler(404, "Not valid user"));
   }
 
   try {
-    const userId: ObjectId = req.user.id;
+    const userId: Types.ObjectId = req.user.id;
     const {
       username,
       email,
@@ -182,6 +147,7 @@ export const updateUser = async (
       .cookie("access_token", token, {
         httpOnly: true,
         sameSite: "strict",
+        maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);
   } catch (error) {

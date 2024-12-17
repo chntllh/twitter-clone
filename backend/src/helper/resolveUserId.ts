@@ -9,14 +9,17 @@ export const resolveUserId = async (
     throw errorHandler(404, "No identifier");
   }
 
+  let user: any;
+
   if (mongoose.Types.ObjectId.isValid(identifier)) {
-    return new mongoose.Types.ObjectId(identifier);
+    user = await User.findById(identifier).select("_id").lean();
+  } else {
+    user = await User.findOne({ username: identifier }).select("_id").lean();
   }
 
-  const user = await User.findOne({ username: identifier });
   if (!user) {
     throw errorHandler(404, "No user");
   }
 
-  return user.id as mongoose.Types.ObjectId;
+  return user._id;
 };

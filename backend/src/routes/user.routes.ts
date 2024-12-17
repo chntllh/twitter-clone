@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { protect } from "../middleware/protect";
-import { getUser, test, updateUser } from "../controllers/user.controller";
+import { getUser, updateUser } from "../controllers/user.controller";
 import {
   follow,
   followers,
@@ -15,7 +15,6 @@ import {
 
 const router = Router();
 
-router.get("/test", test);
 router.get("/:identifier", protect, getUser);
 router.get("/:identifier/followers", protect, followers);
 router.get("/:identifier/following", protect, following);

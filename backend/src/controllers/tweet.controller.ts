@@ -1,91 +1,47 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose, { ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import { InterfaceUser } from "../models/user.model";
-import { resolveUserId } from "../helper/userIdResolver";
+import { resolveUserId } from "../helper/resolveUserId";
 import Tweet from "../models/tweet.model";
 import Follower from "../models/follower.model";
-import Like from "../models/like.model";
 import { extractHashtags } from "../helper/extractHashtags";
 import Hashtag from "../models/hashtag.model";
 import TweetHashtag from "../models/tweet-hashtag.model";
-
-export interface CustomRequest extends Request {
-  user?: {
-    id: ObjectId;
-  };
-}
-
-interface FormattedTweet {
-  tweetId: string;
-  userId: string;
-  avatarUrl?: string;
-  displayName: string;
-  username: string;
-  content: string;
-  imageUrl?: string;
-  likesCount: number;
-  retweetCount: number;
-  createdAt: Date;
-}
-
-const formatTweet = (tweet: any): FormattedTweet => ({
-  tweetId: tweet._id.toString(),
-  userId: tweet.userId._id.toString(),
-  avatarUrl: tweet.userId.avatarUrl,
-  displayName: tweet.userId.displayName,
-  username: tweet.userId.username,
-  content: tweet.content,
-  imageUrl: tweet.imageUrl,
-  likesCount: tweet.likesCount,
-  retweetCount: tweet.retweetCount,
-  createdAt: tweet.createdAt,
-});
-
-export const test = (req, res) => {
-  res.json({ message: "tweet api working" });
-};
+import { CustomRequest } from "../types/request.interface";
+import { FormattedTweet } from "../types/tweet.interface";
+import { formatTweet } from "../helper/formatTweet";
+import { fetchTweets } from "../helper/fetchTweets";
 
 export const postTweet = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { content, imageUrl } = req.body;
 
-  if (!content || content === "") {
-    return next(errorHandler(400, "Content empty"));
-  }
-
-  if (!req.user) {
-    return next(errorHandler(400, "No user"));
-  }
+  if (!content) return next(errorHandler(400, "Content empty"));
 
   const tweetData = {
-    userId: req.user.id,
+    userId: req.user!.id,
     content,
     ...(imageUrl && { imageUrl }),
   };
 
   try {
-    const tweet = new Tweet(tweetData);
-    await tweet.save();
-
+    const tweet = await new Tweet(tweetData).save();
     const hashtags = extractHashtags(content);
 
     for (const tag of hashtags) {
-      let hashtagDoc = await Hashtag.findOne({ hashtag: tag });
+      const hashtagDoc = await Hashtag.findOneAndUpdate(
+        { hashtag: tag },
+        {},
+        { new: true, upsert: true }
+      );
 
-      if (!hashtagDoc) {
-        hashtagDoc = new Hashtag({ hashtag: tag });
-        await hashtagDoc.save();
-      }
-
-      const tweetHashtag = new TweetHashtag({
+      await new TweetHashtag({
         tweetId: tweet._id,
         hashtagId: hashtagDoc._id,
-      });
-      await tweetHashtag.save();
+      }).save();
     }
 
     const populatedTweet = await Tweet.findById(tweet._id)
@@ -95,9 +51,7 @@ export const postTweet = async (
       )
       .lean();
 
-    if (!populatedTweet) {
-      return next(errorHandler(404, "Tweet not found"));
-    }
+    if (!populatedTweet) return next(errorHandler(404, "Tweet not found"));
 
     const formattedTweet: FormattedTweet = formatTweet(populatedTweet);
 
@@ -111,24 +65,9 @@ export const getAllTweets = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const tweets = await Tweet.find()
-      .populate<{ userId: InterfaceUser }>(
-        "userId",
-        "_id username displayName avatarUrl"
-      )
-      .sort("-createdAt")
-      .select("content imageUrl likesCount retweetCount createdAt userId")
-      .lean();
-
-    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
-    const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
-
-    const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
-      ...formatTweet(tweet),
-      liked: userLikes.has(tweet._id.toString()),
-    }));
+    const formattedTweets = await fetchTweets({}, req.user!.id);
 
     res.status(200).json(formattedTweets);
   } catch (error) {
@@ -140,28 +79,10 @@ export const getUserTweets = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
-
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
-
-    const tweets = await Tweet.find({ userId: userId })
-      .populate<{ userId: InterfaceUser }>(
-        "userId",
-        "_id displayName username avatarUrl"
-      )
-      .sort("-createdAt")
-      .select("content imageUrl likesCount retweetCount createdAt userId")
-      .lean();
-
-    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
-    const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
-
-    const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
-      ...formatTweet(tweet),
-      liked: userLikes.has(tweet._id.toString()),
-    }));
+    const userId = await resolveUserId(req.params.identifier);
+    const formattedTweets = await fetchTweets({ userId }, req.user!.id);
 
     res.status(200).json(formattedTweets);
   } catch (error) {
@@ -173,33 +94,18 @@ export const getUserFollowingTweets = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
-
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
-
+    const userId = await resolveUserId(req.params.identifier);
     const following = await Follower.find({ followerId: userId })
       .select("userId")
       .lean();
+
     const followingUserIds = following.map((follow) => follow.userId);
-
-    const tweets = await Tweet.find({ userId: { $in: followingUserIds } })
-      .populate<{ userId: InterfaceUser }>(
-        "userId",
-        "_id username displayName avatarUrl"
-      )
-      .sort({ createdAt: -1 })
-      .select("content imageUrl likesCount retweetCount createdAt userId")
-      .lean();
-
-    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
-    const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
-
-    const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({
-      ...formatTweet(tweet),
-      liked: userLikes.has(tweet._id.toString()),
-    }));
+    const formattedTweets = await fetchTweets(
+      { userId: { $in: followingUserIds } },
+      req.user!.id
+    );
 
     res.status(200).json(formattedTweets);
   } catch (error) {

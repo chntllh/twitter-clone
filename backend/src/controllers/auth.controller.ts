@@ -4,50 +4,19 @@ import jwt from "jsonwebtoken";
 import { errorHandler } from "../middleware/errorHandler";
 import User, { InterfaceUser } from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
-
-interface FormattedUser {
-  userId: string;
-  username: string;
-  displayName: string;
-  bio: string | undefined;
-  avatarUrl: string;
-  followersCount: number;
-  followingCount: number;
-  createdAt: Date;
-}
-
-const formatUser = (user: any): FormattedUser => ({
-  userId: user._id,
-  username: user.username,
-  displayName: user.displayName,
-  bio: user.bio,
-  avatarUrl: user.avatarUrl,
-  followersCount: user.followersCount,
-  followingCount: user.followingCount,
-  createdAt: user.createdAt,
-});
+import { FormattedUser } from "../types/user.interface";
+import { formatUser } from "../helper/formatUser";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-export const test = (req: Request, res: Response) => {
-  res.json({ message: "Auth API path is working" });
-};
 
 export const register = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { email, name, password } = req.body;
 
-  if (
-    !email ||
-    !name ||
-    !password ||
-    email === "" ||
-    name === "" ||
-    password === ""
-  ) {
+  if (!email || !name || !password) {
     return next(errorHandler(400, "All fields are required"));
   }
 
@@ -61,14 +30,12 @@ export const register = async (
   try {
     const hashedPassword: string = await bcryptjs.hash(password, 10);
 
-    const newUser = new User({
+    const newUser = await new User({
       displayName: name,
       username: username,
       email,
       passwordHash: hashedPassword,
-    });
-
-    await newUser.save();
+    }).save();
 
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET!);
 
@@ -94,10 +61,10 @@ export const login = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { identifier, password } = req.body;
 
-  if (!identifier || !password || identifier === "" || password === "") {
+  if (!identifier || !password) {
     return next(errorHandler(400, "All fields are required"));
   }
 
@@ -140,7 +107,7 @@ export const google = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { email, name, googlePhotoUrl } = req.body;
 
   try {
@@ -166,15 +133,13 @@ export const google = async (
       const randomSuffix = crypto.randomBytes(3).toString("hex");
       const username = `${name.split(" ")[0].toLowerCase()}${randomSuffix}`;
 
-      const newUser = new User({
+      const newUser = await new User({
         username: username,
         displayName: name,
         passwordHash: hashedPassword,
         email: email,
         avatarUrl: googlePhotoUrl,
-      });
-
-      await newUser.save();
+      }).save();
 
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET!);
 

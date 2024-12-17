@@ -5,53 +5,17 @@ import { errorHandler } from "../middleware/errorHandler";
 import Tweet from "../models/tweet.model";
 import { InterfaceUser } from "../models/user.model";
 import Like from "../models/like.model";
-import { CustomRequest } from "./user.controller";
-
-interface FormatHashtag {
-  hashtagId: string;
-  hashtag: string;
-}
-
-const formatHashtag = (hashtag: any): FormatHashtag => ({
-  hashtagId: hashtag._id.toString(),
-  hashtag: hashtag.hashtag,
-});
-
-interface FormattedTweet {
-  tweetId: string;
-  userId: string;
-  avatarUrl?: string;
-  displayName: string;
-  username: string;
-  content: string;
-  imageUrl?: string;
-  likesCount: number;
-  retweetCount: number;
-  createdAt: Date;
-}
-
-const formatTweet = (tweet: any): FormattedTweet => ({
-  tweetId: tweet._id.toString(),
-  userId: tweet.userId._id.toString(),
-  avatarUrl: tweet.userId.avatarUrl,
-  displayName: tweet.userId.displayName,
-  username: tweet.userId.username,
-  content: tweet.content,
-  imageUrl: tweet.imageUrl,
-  likesCount: tweet.likesCount,
-  retweetCount: tweet.retweetCount,
-  createdAt: tweet.createdAt,
-});
-
-export const test = (req, res) => {
-  res.json({ message: "search api working" });
-};
+import { FormatHashtag } from "../types/search.interface";
+import { CustomRequest } from "../types/request.interface";
+import { formatTweet } from "../helper/formatTweet";
+import { FormattedTweet } from "../types/tweet.interface";
+import { formatHashtag } from "../helper/formatHashtag";
 
 export const getAllHashtags = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const hashtags = await Hashtag.find();
 
@@ -69,7 +33,7 @@ export const getHashtagTweets = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const { hashtag } = req.params;
 
   if (!hashtag || hashtag === "") {

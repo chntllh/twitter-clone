@@ -1,50 +1,42 @@
-import mongoose, { isValidObjectId, ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Follower from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
 import User, { InterfaceUser } from "../models/user.model";
-import { resolveUserId } from "../helper/userIdResolver";
+import { resolveUserId } from "../helper/resolveUserId";
+import { CustomRequest } from "../types/request.interface";
+import { FormattedRelation } from "../types/follow.interface";
 
-export interface CustomRequest extends Request {
-  user?: {
-    id: ObjectId;
-  };
-}
-
-interface FormattedRelation {
-  userId: ObjectId;
-  username: string;
-  avatarUrl: string | undefined;
-  displayName: string;
-  bio?: string;
-}
-
-export const test = (req, res) => {
-  res.json({ message: "follow api working" });
+const updateFollowCounts = async (
+  userId: mongoose.Types.ObjectId,
+  followerId: mongoose.Types.ObjectId,
+  increment: boolean
+): Promise<void> => {
+  const value = increment ? 1 : -1;
+  await Promise.all([
+    await User.findByIdAndUpdate(userId, { $inc: { followersCount: value } }),
+    await User.findByIdAndUpdate(followerId, {
+      $inc: { followingCount: value },
+    }),
+  ]);
 };
 
 export const follow = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
+    const userId: mongoose.Types.ObjectId = await resolveUserId(
+      req.params.identifier
+    );
 
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
+    const follow = await new Follower({
+      userId,
+      followerId: req.user!.id,
+    }).save();
 
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
-
-    const follow = new Follower({
-      userId: userId,
-      followerId: req.user.id,
-    });
-    await follow.save();
-
-    await User.findByIdAndUpdate(userId, { $inc: { followersCount: 1 } });
-    await User.findByIdAndUpdate(req.user.id, { $inc: { followingCount: 1 } });
+    await updateFollowCounts(userId, req.user!.id, true);
 
     res.status(200).json({ body: follow });
   } catch (error: any) {
@@ -59,27 +51,22 @@ export const unfollow = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
-
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
-
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(
+      req.params.identifier
+    );
 
     const deleteFollow = await Follower.findOneAndDelete({
       userId: userId,
-      followerId: req.user.id,
+      followerId: req.user!.id,
     });
 
     if (!deleteFollow) {
       return next(errorHandler(404, "Follow not found for user"));
     }
 
-    await User.findByIdAndUpdate(userId, { $inc: { followersCount: -1 } });
-    await User.findByIdAndUpdate(req.user.id, { $inc: { followingCount: -1 } });
+    await updateFollowCounts(userId, req.user!.id, false);
 
     res.status(200).json({ message: "Unfollowed successfully" });
   } catch (error) {
@@ -91,13 +78,13 @@ export const followers = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
+    const userId: mongoose.Types.ObjectId = await resolveUserId(
+      req.params.identifier
+    );
 
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
-
-    const followers = await Follower.find({ userId: userId })
+    const followers = await Follower.find({ userId })
       .populate<{ followerId: InterfaceUser }>(
         "followerId",
         "_id displayName username avatarUrl bio"
@@ -124,11 +111,11 @@ export const following = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
-
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
+    const userId: mongoose.Types.ObjectId = await resolveUserId(
+      req.params.identifier
+    );
 
     const follows = await Follower.find({ followerId: userId })
       .populate<{ userId: InterfaceUser }>(
@@ -151,19 +138,19 @@ export const following = async (
   }
 };
 
-export const isFollowing = async (req, res, next) => {
+export const isFollowing = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const { identifier } = req.params;
-
-    const userId: mongoose.Types.ObjectId = await resolveUserId(identifier);
-
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
+    const userId: mongoose.Types.ObjectId = await resolveUserId(
+      req.params.identifier
+    );
 
     const followExists = await Follower.findOne({
       userId,
-      followerId: req.user.id,
+      followerId: req.user!.id,
     });
 
     res.status(200).json({

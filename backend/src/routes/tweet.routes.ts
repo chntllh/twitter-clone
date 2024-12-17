@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { protect } from "../middleware/protect";
-import { getAllTweets, postTweet, test } from "../controllers/tweet.controller";
+import { getAllTweets, postTweet } from "../controllers/tweet.controller";
 import {
   likeTweet,
   retweetTweet,
@@ -10,7 +10,6 @@ import {
 
 const router = Router();
 
-router.get("/test", test);
 router.post("/", protect, postTweet);
 router.get("/all", protect, getAllTweets);
 router.post("/:tweetId/like", protect, likeTweet);

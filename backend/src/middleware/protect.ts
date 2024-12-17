@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { errorHandler } from "./errorHandler";
 
-export interface CustomRequest extends Request {
+interface CustomRequest extends Request {
   user?: string | JwtPayload;
 }
 

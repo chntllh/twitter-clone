@@ -1,43 +1,48 @@
 import { NextFunction, Request, Response } from "express";
-import mongoose, { ObjectId } from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Like from "../models/like.model";
 import Tweet from "../models/tweet.model";
 import Retweet from "../models/retweet.model";
+import { CustomRequest } from "../types/request.interface";
 
-export interface CustomRequest extends Request {
-  user?: {
-    id: ObjectId;
-  };
-}
+const validateTweetId = async (
+  tweetId: string,
+  next: NextFunction
+): Promise<void> => {
+  if (!tweetId || !isValidObjectId(tweetId)) {
+    return next(errorHandler(404, "Invalid or missing tweet ID"));
+  }
 
-export const test = (req, res) => {
-  res.json({ message: "tweet action api working" });
+  const tweetExists = await Tweet.exists({ _id: tweetId });
+  if (!tweetExists) {
+    return next(errorHandler(404, "Tweet not found"));
+  }
+};
+
+const updateTweetCount = async (
+  tweetId: string,
+  field: "likesCount" | "retweetCount",
+  value: number
+): Promise<void> => {
+  await Tweet.findByIdAndUpdate(tweetId, { $inc: { [field]: value } });
 };
 
 export const likeTweet = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { tweetId } = req.params;
+    await validateTweetId(tweetId, next);
 
-    if (!tweetId || !mongoose.isValidObjectId(tweetId)) {
-      return next(errorHandler(404, "Tweet not found"));
-    }
-
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
-
-    const like = new Like({
-      userId: req.user.id,
+    const like = await new Like({
+      userId: req.user!.id,
       tweetId: tweetId,
-    });
-    await like.save();
+    }).save();
 
-    await Tweet.findByIdAndUpdate(tweetId, { $inc: { likesCount: 1 } });
+    await updateTweetCount(tweetId, "likesCount", 1);
 
     res.status(200).json({ body: like });
   } catch (error: any) {
@@ -52,28 +57,22 @@ export const unlikeTweet = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { tweetId } = req.params;
 
-    if (!tweetId || !mongoose.isValidObjectId(tweetId)) {
-      return next(errorHandler(404, "Tweet not found"));
-    }
+    await validateTweetId(tweetId, next);
 
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
-
-    const deleteLike = await Like.findOneAndDelete({
-      userId: req.user.id,
+    const like = await Like.findOneAndDelete({
+      userId: req.user!.id,
       tweetId: tweetId,
     });
 
-    if (!deleteLike) {
+    if (!like) {
       return next(errorHandler(404, "Like not found for tweet"));
     }
 
-    await Tweet.findByIdAndUpdate(tweetId, { $inc: { likesCount: -1 } });
+    await updateTweetCount(tweetId, "likesCount", -1);
 
     res.status(200).json({ message: "Unlike successful" });
   } catch (error) {
@@ -85,25 +84,17 @@ export const retweetTweet = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { tweetId } = req.params;
+    await validateTweetId(tweetId, next);
 
-    if (!tweetId || !mongoose.isValidObjectId(tweetId)) {
-      return next(errorHandler(404, "Tweet not found"));
-    }
-
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
-
-    const retweet = new Retweet({
-      userId: req.user.id,
+    const retweet = await new Retweet({
+      userId: req.user!.id,
       tweetId: tweetId,
-    });
-    await retweet.save();
+    }).save();
 
-    await Retweet.findByIdAndUpdate(tweetId, { $inc: { retweetCount: 1 } });
+    await updateTweetCount(tweetId, "retweetCount", 1);
 
     res.status(200).json({ body: retweet });
   } catch (error: any) {
@@ -118,28 +109,21 @@ export const unretweetTweet = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const { tweetId } = req.params;
+    await validateTweetId(tweetId, next);
 
-    if (!tweetId || !mongoose.isValidObjectId(tweetId)) {
-      return next(errorHandler(404, "Tweet not found"));
-    }
-
-    if (!req.user) {
-      return next(errorHandler(400, "No user"));
-    }
-
-    const deleteRetweet = await Retweet.findOneAndDelete({
-      userId: req.user.id,
+    const retweet = await Retweet.findOneAndDelete({
+      userId: req.user!.id,
       tweetId: tweetId,
     });
 
-    if (!deleteRetweet) {
+    if (!retweet) {
       return next(errorHandler(404, "Retweet not found for tweet"));
     }
 
-    await Tweet.findByIdAndUpdate(tweetId, { $inc: { retweetCount: -1 } });
+    await updateTweetCount(tweetId, "retweetCount", -1);
 
     res.status(200).json({ message: "Unretweet successful" });
   } catch (error) {

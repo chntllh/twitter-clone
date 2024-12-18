@@ -10,7 +10,7 @@ import TweetHashtag from "../models/tweet-hashtag.model";
 import { CustomRequest } from "../types/request.interface";
 import { FormattedTweet } from "../types/tweet.interface";
 import { formatTweet } from "../helper/formatTweet";
-import { fetchTweets } from "../helper/fetchTweets";
+import { fetchTweetsAndRetweets } from "../helper/fetchTweetsAndRetweets";
 
 export const postTweet = async (
   req: CustomRequest,
@@ -67,7 +67,7 @@ export const getAllTweets = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const formattedTweets = await fetchTweets({}, req.user!.id);
+    const formattedTweets = await fetchTweetsAndRetweets({}, req.user!.id);
 
     res.status(200).json(formattedTweets);
   } catch (error) {
@@ -82,7 +82,10 @@ export const getUserTweets = async (
 ): Promise<void> => {
   try {
     const userId = await resolveUserId(req.params.identifier);
-    const formattedTweets = await fetchTweets({ userId }, req.user!.id);
+    const formattedTweets = await fetchTweetsAndRetweets(
+      { userId },
+      req.user!.id
+    );
 
     res.status(200).json(formattedTweets);
   } catch (error) {
@@ -102,7 +105,7 @@ export const getUserFollowingTweets = async (
       .lean();
 
     const followingUserIds = following.map((follow) => follow.userId);
-    const formattedTweets = await fetchTweets(
+    const formattedTweets = await fetchTweetsAndRetweets(
       { userId: { $in: followingUserIds } },
       req.user!.id
     );

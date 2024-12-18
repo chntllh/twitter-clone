@@ -2,9 +2,9 @@ import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import ProfileHeader from "../components/ui/Profile/ProfileHeader.jsx";
 import { useEffect, useState } from "react";
-import Post from "../components/ui/Post/Post.jsx";
 import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs.jsx";
 import { getUser, getUserTweets } from "../api/api.js";
+import Posts from "../components/ui/Post/Posts.jsx";
 
 const Profile = () => {
   const { currentUser } = useSelector((state) => state.user) || {};
@@ -76,10 +76,7 @@ const Profile = () => {
             setActiveTab={setActiveTab}
           />
 
-          <div>
-            {activeTab === "tweets" &&
-              posts.map((post) => <Post post={post} key={post.tweetId} />)}
-          </div>
+          <div>{activeTab === "tweets" && <Posts posts={posts} />}</div>
         </div>
       )}
     </div>

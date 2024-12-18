@@ -1,12 +1,24 @@
 export interface FormattedTweet {
-  tweetId: string;
-  userId: string;
-  avatarUrl?: string;
-  displayName: string;
-  username: string;
-  content: string;
-  imageUrl?: string;
-  likesCount: number;
-  retweetCount: number;
-  createdAt: Date;
+  tweet: {
+    tweetId: string;
+    content: string;
+    imageUrl?: string;
+    likesCount: number;
+    retweetCount: number;
+    createdAt: Date;
+  };
+  user: {
+    userId: string;
+    avatarUrl?: string;
+    displayName: string;
+    username: string;
+  };
+  retweeter?: {
+    retweetId: string;
+    userId: string;
+    avatarUrl?: string;
+    displayName: string;
+    username: string;
+    retweetedAt: Date;
+  };
 }

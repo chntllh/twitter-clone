@@ -8,31 +8,44 @@ import {
   HiOutlineChatBubbleOvalLeft,
   HiOutlineHeart,
 } from "react-icons/hi2";
-import { useEffect, useRef, useState } from "react";
+import { PiDotBold } from "react-icons/pi";
+import { useCallback, useEffect, useRef, useState } from "react";
 import HoverCard from "./HoverCard.jsx";
-import { likeTweet, unlikeTweet } from "../../../api/api.js";
+import {
+  likeTweet,
+  retweetTweet,
+  unlikeTweet,
+  unretweetTweet,
+} from "../../../api/api.js";
 import { getRelativeTime } from "../../../utils/relativeTime.js";
 import { FormatContentWithHashtags } from "../../func/FormatContentWithHashtags.jsx";
+import { useNavigate } from "react-router-dom";
 
 const Post = ({ post }) => {
+  const navigate = useNavigate();
+
+  console.log(post);
+
   const {
-    avatarUrl,
-    displayName,
-    username,
-    createdAt,
-    content,
-    imageUrl,
-    commentsCount = 0,
-    retweetCount = 0,
-    likesCount: initialLikesCount = 0,
-    sharesCount = 0,
-    userId,
-    tweetId,
+    user: { userId, avatarUrl, displayName, username },
+    tweet: {
+      tweetId,
+      content,
+      imageUrl,
+      createdAt,
+      likesCount: initialLikesCount = 0,
+      retweetCount: initialRetweetsCount = 0,
+      commentsCount = 0,
+      sharesCount = 0,
+    },
     liked: initialLiked = false,
+    retweeted: initialRetweeted = false,
   } = post;
 
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [liked, setLiked] = useState(initialLiked);
+  const [retweetCount, setRetweetCount] = useState(initialRetweetsCount);
+  const [retweeted, setRetweeted] = useState(initialRetweeted);
   const [isHovered, setIsHovered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -47,14 +60,14 @@ const Post = ({ post }) => {
     setIsVisible(true);
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     hoverTimeoutRef.current = setTimeout(() => {
       setIsHovered(false);
-    }, 500);
+    }, 300);
     visibleTimeoutRef.current = setTimeout(() => {
       setIsVisible(false);
-    }, 1000);
-  };
+    }, 500);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -62,6 +75,10 @@ const Post = ({ post }) => {
       if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
     };
   }, []);
+
+  const handleOpenProfile = () => {
+    navigate(`/${username}`);
+  };
 
   const toggleLike = () => {
     if (liked) {
@@ -85,8 +102,30 @@ const Post = ({ post }) => {
     }
   };
 
+  const toggleRetweet = () => {
+    if (retweeted) {
+      unretweetTweet(tweetId)
+        .then(() => {
+          setRetweetCount((prev) => prev - 1);
+          setRetweeted(false);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else {
+      retweetTweet(tweetId)
+        .then(() => {
+          setRetweetCount((prev) => prev + 1);
+          setRetweeted(true);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  };
+
   return (
-    <div className="flex p-4 gap-2 border-b max-w-full border-gray-600">
+    <div className="flex p-4 gap-2 border-b max-w-full border-gray-600 hover:cursor-pointer hover:bg-gray-900">
       <div
         className="relative w-16 h-16 cursor-pointer flex-shrink-0"
         onMouseEnter={handleMouseEnter}
@@ -96,7 +135,9 @@ const Post = ({ post }) => {
         <img
           className="left-0 top-0 w-14 h-14 object-cover rounded-full"
           src={avatarUrl}
+          loading="lazy"
           alt={`${displayName}'s profile`}
+          onClick={handleOpenProfile}
         />
 
         {/* Hover Card */}
@@ -111,16 +152,16 @@ const Post = ({ post }) => {
         )}
       </div>
 
-      <div className="w-full overflow-auto">
+      <div className="w-full overflow-hidden">
         {/* Header: displayName, username, and Options */}
         <div className="flex justify-between">
-          <div className="flex gap-1">
-            <h1 className="font-medium hover:underline cursor-pointer">
-              {displayName}
-            </h1>
-            <h1 className="font-light text-gray-300">
-              @{username} · {getRelativeTime(createdAt)}
-            </h1>
+          <div className="flex items-center">
+            <div className="flex gap-1" onClick={handleOpenProfile}>
+              <p className="font-medium hover:underline">{displayName}</p>
+              <p className="font-light">@{username}</p>
+            </div>
+            <PiDotBold />
+            <p className="font-light">{getRelativeTime(createdAt)}</p>
           </div>
           <HiEllipsisHorizontal className="text-2xl cursor-pointer" />
         </div>
@@ -139,9 +180,6 @@ const Post = ({ post }) => {
             </button>
           )}
         </div>
-        {/* <div className="py-2 whitespace-pre-wrap break-words">
-          {FormatContentWithHashtags(content)}
-        </div> */}
 
         {/* Post Image (if available) */}
         {imageUrl && (
@@ -159,10 +197,17 @@ const Post = ({ post }) => {
             <HiOutlineChatBubbleOvalLeft />
             <div className="text-sm">{commentsCount}</div>
           </div>
-          <div className="flex items-center gap-1 hover:cursor-pointer">
+
+          <div
+            className={`flex items-center gap-1 hover:cursor-pointer ${
+              retweeted && "text-green-400"
+            }`}
+            onClick={toggleRetweet}
+          >
             <HiArrowPathRoundedSquare />
             <div className="text-sm">{retweetCount}</div>
           </div>
+
           <div
             className="flex items-center gap-1 hover:cursor-pointer"
             onClick={toggleLike}
@@ -176,10 +221,12 @@ const Post = ({ post }) => {
             )}
             <div className="text-sm">{likesCount}</div>
           </div>
+
           <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiOutlineBars3CenterLeft />
             <div className="text-sm">{sharesCount}</div>
           </div>
+
           <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiOutlineBookmark />
             <HiMiniArrowUpTray />

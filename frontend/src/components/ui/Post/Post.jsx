@@ -24,8 +24,6 @@ import { useNavigate } from "react-router-dom";
 const Post = ({ post }) => {
   const navigate = useNavigate();
 
-  console.log(post);
-
   const {
     user: { userId, avatarUrl, displayName, username },
     tweet: {
@@ -38,6 +36,7 @@ const Post = ({ post }) => {
       commentsCount = 0,
       sharesCount = 0,
     },
+    retweeter,
     liked: initialLiked = false,
     retweeted: initialRetweeted = false,
   } = post;
@@ -77,7 +76,8 @@ const Post = ({ post }) => {
   }, []);
 
   const handleOpenProfile = () => {
-    navigate(`/${username}`);
+    console.log(retweeter);
+    navigate(`/${retweeter ? retweeter.username : username}`);
   };
 
   const toggleLike = () => {
@@ -134,9 +134,9 @@ const Post = ({ post }) => {
         {/* Profile Picture */}
         <img
           className="left-0 top-0 w-14 h-14 object-cover rounded-full"
-          src={avatarUrl}
+          src={`${retweeter ? retweeter.avatarUrl : avatarUrl}`}
           loading="lazy"
-          alt={`${displayName}'s profile`}
+          alt={`${retweeter ? retweeter.displayName : displayName}'s profile`}
           onClick={handleOpenProfile}
         />
 
@@ -147,27 +147,50 @@ const Post = ({ post }) => {
               isHovered ? "opacity-100" : "opacity-0"
             }`}
           >
-            <HoverCard userId={userId} />
+            <HoverCard userId={retweeter ? retweeter.userId : userId} />
           </div>
         )}
       </div>
 
       <div className="w-full overflow-hidden">
         {/* Header: displayName, username, and Options */}
-        <div className="flex justify-between">
+        <div className="flex justify-between mb-1">
           <div className="flex items-center">
             <div className="flex gap-1" onClick={handleOpenProfile}>
-              <p className="font-medium hover:underline">{displayName}</p>
-              <p className="font-light">@{username}</p>
+              <p className="font-medium hover:underline">
+                {retweeter ? retweeter.displayName : displayName}
+              </p>
+              <p className="font-light">
+                @{retweeter ? retweeter.username : username}
+              </p>
             </div>
             <PiDotBold />
-            <p className="font-light">{getRelativeTime(createdAt)}</p>
+            <p className="font-light">
+              {getRelativeTime(retweeter ? retweeter.retweetedAt : createdAt)}
+            </p>
           </div>
           <HiEllipsisHorizontal className="text-2xl cursor-pointer" />
         </div>
 
         {/* Post Text */}
-        <div className="py-2 whitespace-pre-wrap break-words">
+        <div
+          className={`whitespace-pre-wrap break-words ${
+            retweeter && "border border-gray-600 rounded-lg mt-3 p-4 hover:bg-gray-800"
+          }`}
+        >
+          {retweeter && (
+            <div className="flex gap-1 items-center mb-2">
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="w-8 h-8 object-cover rounded-full mr-1"
+              />
+              <p className="font-medium">{displayName}</p>
+              <p className="font-light">{username}</p>
+              <PiDotBold />
+              <p className="font-light">{getRelativeTime(createdAt)}</p>
+            </div>
+          )}
           <div className={`${isExpanded ? "" : "line-clamp-4"}`}>
             {FormatContentWithHashtags(content)}
           </div>

@@ -38,7 +38,7 @@ export const follow = async (
 
     await updateFollowCounts(userId, req.user!.id, true);
 
-    res.status(200).json({ body: follow });
+    res.status(200).json(follow);
   } catch (error: any) {
     if (error.code === 11000) {
       return next(errorHandler(409, "Duplicate follow request"));
@@ -93,7 +93,7 @@ export const followers = async (
 
     const formattedFollowers: FormattedRelation[] = followers.map(
       (follower) => ({
-        userId: follower.followerId._id as ObjectId,
+        userId: follower.followerId._id.toString(),
         username: follower.followerId.username,
         displayName: follower.followerId.displayName,
         avatarUrl: follower.followerId.avatarUrl,
@@ -125,7 +125,7 @@ export const following = async (
       .lean();
 
     const formattedFollowings: FormattedRelation[] = follows.map((follow) => ({
-      userId: follow.userId._id as ObjectId,
+      userId: follow.userId._id.toString(),
       username: follow.userId.username,
       displayName: follow.userId.displayName,
       avatarUrl: follow.userId.avatarUrl,

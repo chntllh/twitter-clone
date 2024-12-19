@@ -1,7 +1,5 @@
-import { ObjectId } from "mongoose";
-
 export interface FormattedRelation {
-  userId: ObjectId;
+  userId: string;
   username: string;
   avatarUrl: string | undefined;
   displayName: string;

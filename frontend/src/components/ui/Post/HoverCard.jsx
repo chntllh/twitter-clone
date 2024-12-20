@@ -18,7 +18,7 @@ const HoverCard = ({ userId }) => {
       getUserAndIsFollowing(userId)
         .then((res) => {
           setUser(res.user);
-          setIsFollowing(res.isFollowing.isFollowing);
+          setIsFollowing(res.isFollowing);
         })
         .catch((error) => {
           console.error(error);

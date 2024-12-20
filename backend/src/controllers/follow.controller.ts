@@ -153,9 +153,7 @@ export const isFollowing = async (
       followerId: req.user!.id,
     });
 
-    res.status(200).json({
-      isFollowing: !!followExists,
-    });
+    res.status(200).json(!!followExists);
   } catch (error) {
     next(error);
   }

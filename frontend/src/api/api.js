@@ -1,7 +1,5 @@
 import apiClient from "./apiClient.js";
 
-export const testUser = () => apiClient.get("/api/user/test");
-
 // Authentication
 export const login = (identifier, password) => {
   return apiClient.post("/api/auth/login", {

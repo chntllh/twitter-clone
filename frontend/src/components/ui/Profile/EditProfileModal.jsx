@@ -11,6 +11,7 @@ import { fireapp } from "../../../firebase.js";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../../../store/reducer/user.reducer.js";
 import { updateUser } from "../../../api/api.js";
+import FloatingLabelTextArea from "../../FloatingLabelTextArea.jsx";
 
 const EditProfileModal = ({ isOpen, onClose, user }) => {
   const dispatch = useDispatch();
@@ -88,14 +89,15 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
       }),
       ...(newBio !== user.bio && { bio: newBio }),
       ...(image && { avatarUrl: await handleUploadImage(image) }),
-    }).then((res) => {
-      dispatch(signInSuccess(res.data));
-      handleClearImage();
-      onClose();
     })
-    .catch((error) => {
-      console.error(error);
-    });
+      .then((res) => {
+        dispatch(signInSuccess(res.data));
+        handleClearImage();
+        onClose();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   return (
@@ -174,9 +176,9 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
 
             <div className="mb-8">
               <FloatingLabelInput
+                id="displayName"
                 label="Name"
                 type="text"
-                id="displayName"
                 value={newDisplayName}
                 maxLength={50}
                 onChange={(e) => setNewDisplayName(e.target.value)}
@@ -184,10 +186,9 @@ const EditProfileModal = ({ isOpen, onClose, user }) => {
             </div>
 
             <div className="mb-8">
-              <FloatingLabelInput
-                label="Bio"
-                type="text"
+              <FloatingLabelTextArea
                 id="bio"
+                label="Bio"
                 value={newBio}
                 maxLength={160}
                 onChange={(e) => setNewBio(e.target.value)}

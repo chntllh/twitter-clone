@@ -185,6 +185,7 @@ const SignIn = () => {
                     }}
                   >
                     <FloatingLabelInput
+                      id="email"
                       ref={identifierInputRef}
                       label="Email or username"
                       type="email"
@@ -229,6 +230,7 @@ const SignIn = () => {
                     }}
                   >
                     <FloatingLabelInput
+                      id="password"
                       ref={passwordInputRef}
                       label="Password"
                       type={passwordFieldType}
@@ -289,6 +291,7 @@ const SignIn = () => {
                     }}
                   >
                     <FloatingLabelInput
+                      id="name"
                       ref={identifierInputRef}
                       label="Name"
                       type="text"
@@ -305,6 +308,7 @@ const SignIn = () => {
                     }}
                   >
                     <FloatingLabelInput
+                      id="email"
                       ref={emailInputRef}
                       label="Email"
                       type="text"
@@ -336,6 +340,7 @@ const SignIn = () => {
                     }}
                   >
                     <FloatingLabelInput
+                      id="password"
                       ref={passwordInputRef}
                       label="Password"
                       type={passwordFieldType}

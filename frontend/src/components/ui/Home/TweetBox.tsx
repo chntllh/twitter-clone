@@ -16,18 +16,20 @@ import {
 import { MdClose } from "react-icons/md";
 import { fireapp } from "../../../firebase";
 import { postTweet } from "../../../api/api";
-import { FormatContentWithHashtags } from "../../func/FormatContentWithHashtags";
+import { FormatContentWithRegex } from "../../func/FormatContentWithRegex";
 
 type TweetBoxProp = {
   profilePictureUrl: string;
   onPost: (post: Tweet) => void;
-}
+};
 
 const TweetBox = ({ profilePictureUrl, onPost }: TweetBoxProp) => {
   const [text, setText] = useState<string>("");
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageUploadProgress, setImageUploadProgress] = useState<string | null>(null);
+  const [imageUploadProgress, setImageUploadProgress] = useState<string | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -105,7 +107,6 @@ const TweetBox = ({ profilePictureUrl, onPost }: TweetBoxProp) => {
     })
       .then((res) => {
         resetState();
-        console.log(res)
         onPost(res.data as Tweet);
       })
       .catch((error) => {
@@ -143,7 +144,7 @@ const TweetBox = ({ profilePictureUrl, onPost }: TweetBoxProp) => {
           <div className="relative">
             {/* Render the formatted hashtags as overlay */}
             <div className="text-2xl text-white pointer-events-none absolute inset-0 w-full whitespace-pre-wrap break-words">
-              {FormatContentWithHashtags(text)}
+              {FormatContentWithRegex(text)}
             </div>
 
             {/* Editable textarea */}
@@ -211,10 +212,11 @@ const TweetBox = ({ profilePictureUrl, onPost }: TweetBoxProp) => {
 
               {/* Post Button */}
               <button
-                className={`${text.trim() || image
-                  ? "bg-blue-500 hover:bg-blue-600"
-                  : "bg-blue-400 cursor-not-allowed"
-                  } px-5 py-1 font-semibold rounded-full`}
+                className={`${
+                  text.trim() || image
+                    ? "bg-blue-500 hover:bg-blue-600"
+                    : "bg-blue-400 cursor-not-allowed"
+                } px-5 py-1 font-semibold rounded-full`}
                 onClick={handlePost}
                 disabled={!text.trim() && !image}
               >

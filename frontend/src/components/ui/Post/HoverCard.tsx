@@ -17,7 +17,6 @@ const HoverCard = ({ userId }: { userId: string }) => {
     const fetchUser = () => {
       getUserAndIsFollowing(userId)
         .then((res) => {
-          console.log(res)
           setUser(res.user as Partial<AppUser>);
           setIsFollowing(res.isFollowing as boolean)
         })

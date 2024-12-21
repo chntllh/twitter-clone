@@ -18,8 +18,8 @@ import {
   unretweetTweet,
 } from "../../../api/api";
 import { getRelativeTime } from "../../../utils/relativeTime";
-import { FormatContentWithHashtags } from "../../func/FormatContentWithHashtags";
 import { useNavigate } from "react-router-dom";
+import { FormatContentWithRegex } from "../../func/FormatContentWithRegex";
 
 type Timeout = ReturnType<typeof setTimeout>;
 
@@ -27,8 +27,8 @@ type ExtendedTweet = Tweet & {
   tweet: Tweet["tweet"] & {
     commentsCount?: number;
     sharesCount?: number;
-  }
-}
+  };
+};
 
 const Post = ({ post }: { post: ExtendedTweet }) => {
   const navigate = useNavigate();
@@ -85,7 +85,6 @@ const Post = ({ post }: { post: ExtendedTweet }) => {
   }, []);
 
   const handleOpenProfile = () => {
-    console.log(retweeter);
     navigate(`/${retweeter ? retweeter.username : username}`);
   };
 
@@ -152,8 +151,9 @@ const Post = ({ post }: { post: ExtendedTweet }) => {
         {/* Hover Card */}
         {isVisible && (
           <div
-            className={`absolute top-12 left-1/2 transform -translate-x-1/2 z-10 transition-opacity duration-500 ${isHovered ? "opacity-100" : "opacity-0"
-              }`}
+            className={`absolute top-12 left-1/2 transform -translate-x-1/2 z-10 transition-opacity duration-500 ${
+              isHovered ? "opacity-100" : "opacity-0"
+            }`}
           >
             <HoverCard userId={retweeter ? retweeter.userId : userId} />
           </div>
@@ -182,8 +182,10 @@ const Post = ({ post }: { post: ExtendedTweet }) => {
 
         {/* Post Text */}
         <div
-          className={`whitespace-pre-wrap break-words ${retweeter && "border border-gray-600 rounded-lg mt-3 p-4 hover:bg-gray-800"
-            }`}
+          className={`whitespace-pre-wrap break-words ${
+            retweeter &&
+            "border border-gray-600 rounded-lg mt-3 p-4 hover:bg-gray-800"
+          }`}
         >
           {retweeter && (
             <div className="flex gap-1 items-center mb-2">
@@ -198,8 +200,8 @@ const Post = ({ post }: { post: ExtendedTweet }) => {
               <p className="font-light">{getRelativeTime(createdAt)}</p>
             </div>
           )}
-          <div className={`${isExpanded ? "" : "line-clamp-4"}`}>
-            {FormatContentWithHashtags(content)}
+          <div className={`mb-2 ${isExpanded ? "" : "line-clamp-4"}`}>
+            {FormatContentWithRegex(content)}
           </div>
           {content.split("\n").length > 4 && (
             <button
@@ -209,28 +211,28 @@ const Post = ({ post }: { post: ExtendedTweet }) => {
               {isExpanded ? "Show Less" : "Show More"}
             </button>
           )}
+          {/* Post Image (if available) */}
+          {imageUrl && (
+            <div className="cursor-pointer">
+              <img
+                className="max-h-[600px] max-w-full object-cover mx-auto border-2 border-gray-300 rounded-2xl"
+                src={imageUrl}
+              />
+            </div>
+          )}
         </div>
 
-        {/* Post Image (if available) */}
-        {imageUrl && (
-          <div className="cursor-pointer">
-            <img
-              className="max-h-[600px] max-w-full object-cover mx-auto border-2 border-gray-300 rounded-2xl"
-              src={imageUrl}
-            />
-          </div>
-        )}
-
         {/* Post Actions: commentsCount, retweetCount, likesCount, etc. */}
-        <div className="w-full flex pt-3 justify-between items-center text-xl text-gray-400">
+        <div className="w-full flex mt-3 justify-between items-center text-xl text-gray-400">
           <div className="flex items-center gap-1 hover:cursor-pointer">
             <HiOutlineChatBubbleOvalLeft />
             <div className="text-sm">{commentsCount}</div>
           </div>
 
           <div
-            className={`flex items-center gap-1 hover:cursor-pointer ${retweeted && "text-green-400"
-              }`}
+            className={`flex items-center gap-1 hover:cursor-pointer ${
+              retweeted && "text-green-400"
+            }`}
             onClick={toggleRetweet}
           >
             <HiArrowPathRoundedSquare />

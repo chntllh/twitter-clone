@@ -19,8 +19,6 @@ const Sidebar = () => {
     dispatch(signOut());
   };
 
-  console.log()
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

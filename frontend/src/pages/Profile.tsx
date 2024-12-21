@@ -60,20 +60,20 @@ const Profile = () => {
         });
     };
 
-    if (typeof (username) === "string" && user === null) {
+    if (typeof username === "string" && user === null) {
       fetchUser(username);
     }
     if (user) {
-      fetchUserPosts(user.userId)
+      fetchUserPosts(user.userId);
     }
   }, [username, user]);
 
   return (
     <div>
+      <ProfileHeader user={user} isOwner={isOwner} />
 
       {user !== null && (
         <div>
-          <ProfileHeader user={user} isOwner={isOwner} />
           <LabelledSelectorTabs
             tabs={tabs}
             activeTab={activeTab}

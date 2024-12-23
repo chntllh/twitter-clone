@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { errorHandler } from "../middleware/errorHandler";
-import { InterfaceUser } from "../models/user.model";
+import User, { InterfaceUser } from "../models/user.model";
 import { resolveUserId } from "../helper/resolveUserId";
 import Tweet from "../models/tweet.model";
 import Follower from "../models/follower.model";
@@ -11,6 +11,9 @@ import { CustomRequest } from "../types/request.interface";
 import { FormattedTweet } from "../types/tweet.interface";
 import { formatTweet } from "../helper/formatTweet";
 import { fetchTweetsAndRetweets } from "../helper/fetchTweetsAndRetweets";
+import { extractMentions } from "../helper/extractMentions";
+import Mention from "../models/mention.model";
+import Notification from "../models/notification.model";
 
 export const postTweet = async (
   req: CustomRequest,
@@ -29,19 +32,55 @@ export const postTweet = async (
 
   try {
     const tweet = await new Tweet(tweetData).save();
-    const hashtags = extractHashtags(content);
 
-    for (const tag of hashtags) {
-      const hashtagDoc = await Hashtag.findOneAndUpdate(
-        { hashtag: tag },
-        {},
-        { new: true, upsert: true }
-      );
+    try {
+      const hashtags = extractHashtags(content);
 
-      await new TweetHashtag({
-        tweetId: tweet._id,
-        hashtagId: hashtagDoc._id,
-      }).save();
+      for (const tag of hashtags) {
+        const hashtagDoc = await Hashtag.findOneAndUpdate(
+          { hashtag: tag },
+          {},
+          { new: true, upsert: true }
+        );
+
+        await new TweetHashtag({
+          tweetId: tweet._id,
+          hashtagId: hashtagDoc._id,
+        }).save();
+      }
+    } catch (error) {
+      return next(errorHandler(500, "Error saving hashtags"));
+    }
+
+    try {
+      const mentions = extractMentions(content);
+
+      if (mentions) {
+        const mentionedUsernames = mentions.map((mention): string =>
+          mention.slice(1)
+        );
+        const mentionedUsers = await User.find({
+          username: { $in: mentionedUsernames },
+        })
+          .select("_id")
+          .lean();
+
+        for (const user of mentionedUsers) {
+          await new Mention({
+            tweetId: tweet._id,
+            mentionedUserId: user._id,
+          }).save();
+
+          await new Notification({
+            userId: user._id,
+            actorId: req.user!.id,
+            tweetId: tweet._id,
+            notificationType: "Tweet mention",
+          }).save();
+        }
+      }
+    } catch (error) {
+      return next(errorHandler(500, "Error saving mentions"));
     }
 
     const populatedTweet = await Tweet.findById(tweet._id)

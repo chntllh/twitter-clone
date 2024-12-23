@@ -42,7 +42,7 @@ export const getHashtagTweets = async (
 
   try {
     const hashtagDoc = await Hashtag.findOne(
-      { hashtag: `#${hashtag.trim()}` },
+      { hashtag: `#${hashtag.trim().toLowerCase()}` },
       { _id: 1 }
     );
 

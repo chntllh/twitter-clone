@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node dist/app.js",
-    "dev": "ts-node-dev --respawn src/app.ts"
+    "dev": "NODE_ENV=test ts-node-dev --respawn src/app.ts",
+    "dev-on": "ts-node-dev --respawn src/app.ts"
   },
   "keywords": [],
   "author": "",

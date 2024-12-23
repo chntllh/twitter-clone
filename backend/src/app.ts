@@ -9,20 +9,28 @@ const logErrorAndExit = (message) => {
   process.exit(1);
 };
 
-const validateEnv = () => {
-  if (!process.env.JWT_SECRET) {
-    logErrorAndExit("JWT_SECRET is missing in the environment variables.");
+dotenv.config({ path: "../.env" });
+
+if (!process.env.JWT_SECRET) {
+  logErrorAndExit("JWT_SECRET is missing in the environment variables.");
+}
+
+let mongoUri: string;
+
+if (process.env.NODE_ENV === "test") {
+  if (!process.env.TEST_URI) {
+    logErrorAndExit("TEST_URI is missing in the environment variables.");
   }
+  mongoUri = process.env.TEST_URI as string;
+} else {
   if (!process.env.MONGO_URI) {
     logErrorAndExit("MONGO_URI is missing in the environment variables.");
   }
-};
-
-dotenv.config({ path: "../.env" });
-validateEnv();
+  mongoUri = process.env.MONGO_URI as string;
+}
 
 mongoose
-  .connect(process.env.MONGO_URI as string)
+  .connect(mongoUri)
   .then(() => console.log("\x1b[33m%s\x1b[0m", "MongoDB connected!"))
   .catch((err: any) => console.log(err));
 
@@ -30,7 +38,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+const allowedOrigins = ["http://localhost:5173", "http://localhost:4173"];
 
 app.use(
   cors({

@@ -4,7 +4,7 @@ import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
-const logErrorAndExit = (message) => {
+const logErrorAndExit = (message: string) => {
   console.error("\x1b[31m%s\x1b[0m", message);
   process.exit(1);
 };

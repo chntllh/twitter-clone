@@ -14,24 +14,30 @@ import { fetchTweetsAndRetweets } from "../helper/fetchTweetsAndRetweets";
 import { extractMentions } from "../helper/extractMentions";
 import Mention from "../models/mention.model";
 import Notification from "../models/notification.model";
+import { startSession } from "mongoose";
 
 export const postTweet = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { content, imageUrl } = req.body;
-
-  if (!content) return next(errorHandler(400, "Content empty"));
-
-  const tweetData = {
-    userId: req.user!.id,
-    content,
-    ...(imageUrl && { imageUrl }),
-  };
+  const session = await startSession();
+  let transactionCommitted = false;
 
   try {
-    const tweet = await new Tweet(tweetData).save();
+    session.startTransaction();
+
+    const { content, imageUrl } = req.body;
+
+    if (!content) return next(errorHandler(400, "Content empty"));
+
+    const tweetData = {
+      userId: req.user!.id,
+      content,
+      ...(imageUrl && { imageUrl }),
+    };
+
+    const tweet = await new Tweet(tweetData).save({ session });
 
     try {
       const hashtags = extractHashtags(content);
@@ -46,9 +52,10 @@ export const postTweet = async (
         await new TweetHashtag({
           tweetId: tweet._id,
           hashtagId: hashtagDoc._id,
-        }).save();
+        }).save({ session });
       }
     } catch (error) {
+      await session.abortTransaction();
       return next(errorHandler(500, "Error saving hashtags"));
     }
 
@@ -69,19 +76,25 @@ export const postTweet = async (
           await new Mention({
             tweetId: tweet._id,
             mentionedUserId: user._id,
-          }).save();
+          }).save({ session });
 
           await new Notification({
             userId: user._id,
             actorId: req.user!.id,
             tweetId: tweet._id,
             notificationType: "Tweet mention",
-          }).save();
+          }).save({ session });
         }
       }
     } catch (error) {
+      await session.abortTransaction();
       return next(errorHandler(500, "Error saving mentions"));
     }
+
+    await session.commitTransaction();
+    transactionCommitted = true;
+
+    session.endSession();
 
     const populatedTweet = await Tweet.findById(tweet._id)
       .populate<{ userId: InterfaceUser }>(
@@ -96,6 +109,8 @@ export const postTweet = async (
 
     res.status(200).json(formattedTweet);
   } catch (error) {
+    if (!transactionCommitted) await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 };

@@ -14,7 +14,7 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState<string>("tweets");
   const [posts, setPosts] = useState<Tweet[]>([]);
 
-  const tabs = [
+  const tabs: LabelledSelectorTab[] = [
     {
       tab: "tweets",
       tabName: "Tweets",

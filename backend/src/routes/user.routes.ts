@@ -12,6 +12,7 @@ import {
   getUserFollowingTweets,
   getUserTweets,
 } from "../controllers/tweet.controller";
+import { getNotification } from "../controllers/notification.controller";
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.get("/:identifier/followingtweets", protect, getUserFollowingTweets);
 router.post("/:identifier/follow", protect, follow);
 router.post("/:identifier/unfollow", protect, unfollow);
 router.post("/update", protect, updateUser);
+router.get("/:identifier/notifications", protect, getNotification);
 
 export default router;

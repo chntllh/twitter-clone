@@ -6,13 +6,16 @@ import ProfileCard from "./ProfileCard";
 import { getFollowers, getFollowing } from "../../../api/api";
 
 const FollowInfo = () => {
-  const { username, followinfo } = useParams<{ username: string, followinfo: string }>();
+  const { username, followinfo } = useParams<{
+    username: string;
+    followinfo: string;
+  }>();
   const navigate = useNavigate();
 
   const [followers, setFollowers] = useState<AppUser[]>([]);
   const [following, setFollowing] = useState<AppUser[]>([]);
 
-  const tabs = [
+  const tabs: LabelledSelectorTab[] = [
     {
       tab: "following",
       tabName: "Following",

@@ -28,7 +28,13 @@ export const googleLogin = ({ user }: { user: User }) => {
 };
 
 // User
-export const updateUser = (newData: Partial<AppUser>) => {
+type ExtendedNewData = Partial<AppUser> &
+  Partial<{
+    password: string;
+    newPassword: string;
+  }>;
+
+export const updateUser = (newData: ExtendedNewData) => {
   return apiClient.post("/api/user/update", newData);
 };
 

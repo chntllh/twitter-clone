@@ -11,18 +11,20 @@ import { fireapp } from "../../../firebase";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../../../store/reducer/user.reducer";
 import { updateUser } from "../../../api/api";
-import FloatingLabelTextArea from "../../FloatingLabelTextArea";
+import FloatingLabelTextArea from "../FloatingLabelTextArea";
 
 type EditProfileModalProps = {
   isOpen: boolean;
   onClose: () => void;
   user: AppUser;
-}
+};
 
 const EditProfileModal = ({ isOpen, onClose, user }: EditProfileModalProps) => {
   const dispatch = useDispatch();
 
-  const [newDisplayName, setNewDisplayName] = useState<string>(user.displayName);
+  const [newDisplayName, setNewDisplayName] = useState<string>(
+    user.displayName
+  );
   const [newBio, setNewBio] = useState<string>(user.bio);
   const [image, setImage] = useState<File | null>(null);
   // const [imageUploadProgress, setImageUploadProgress] = useState(null);
@@ -89,16 +91,16 @@ const EditProfileModal = ({ isOpen, onClose, user }: EditProfileModalProps) => {
   };
 
   const handleUpdateUser = async () => {
-    const updatePayload: Partial<AppUser> = {}
+    const updatePayload: Partial<AppUser> = {};
 
     if (newDisplayName !== user.displayName) {
       updatePayload.displayName = newDisplayName;
     }
     if (newBio !== user.bio) {
-      updatePayload.bio = newBio
+      updatePayload.bio = newBio;
     }
     if (image) {
-      updatePayload.avatarUrl = await handleUploadImage(image)
+      updatePayload.avatarUrl = await handleUploadImage(image);
     }
 
     updateUser(updatePayload)

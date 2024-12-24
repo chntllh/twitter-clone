@@ -20,7 +20,7 @@ const Explore = () => {
 
   const [searchPosts, setSearchPosts] = useState<Tweet[]>([]);
 
-  const exploreTab = [
+  const exploreTab: LabelledSelectorTab[] = [
     {
       tab: "for-you",
       tabName: "For You",
@@ -43,7 +43,7 @@ const Explore = () => {
     },
   ];
 
-  const searchTabs = [
+  const searchTabs: LabelledSelectorTab[] = [
     {
       tab: "top",
       tabName: "Top",
@@ -100,13 +100,15 @@ const Explore = () => {
       <div className="sticky top-0 pt-2 z-10 backdrop-blur-lg bg-black bg-opacity-30">
         <div className="flex justify-center mb-2">
           <div
-            className={`flex relative w-[90%] h-12 overflow-hidden rounded-full border border-gray-600 ${isFocused && "ring-2 ring-blue-500"
-              }`}
+            className={`flex relative w-[90%] h-12 overflow-hidden rounded-full border border-gray-600 ${
+              isFocused && "ring-2 ring-blue-500"
+            }`}
           >
             <div
               onClick={handleSearch}
-              className={`absolute py-2 px-4 z-10 rounded-full hover:bg-gray-300 hover:bg-opacity-30 hover:cursor-pointer ${isFocused && "text-blue-500"
-                }`}
+              className={`absolute py-2 px-4 z-10 rounded-full hover:bg-gray-300 hover:bg-opacity-30 hover:cursor-pointer ${
+                isFocused && "text-blue-500"
+              }`}
             >
               <BiSearch size={30} />
             </div>

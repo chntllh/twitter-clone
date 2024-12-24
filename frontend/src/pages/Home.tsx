@@ -13,7 +13,7 @@ const Home = () => {
 
   const [activeTab, setActiveTab] = useState("for-you");
 
-  const tabs = [
+  const tabs: LabelledSelectorTab[] = [
     {
       tab: "for-you",
       tabName: "For You",

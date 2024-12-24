@@ -1,22 +1,16 @@
-type Tab = {
-  tab: string;
-  tabName: string;
-}
-
-type LabelledSelectorTabsProps = {
-  tabs: Tab[];
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
-
-const LabelledSelectorTabs = ({ tabs, activeTab, setActiveTab }: LabelledSelectorTabsProps) => {
+const LabelledSelectorTabs = ({
+  tabs,
+  activeTab,
+  setActiveTab,
+}: LabelledSelectorTabsProps) => {
   return (
     <div className="flex border-b border-gray-600">
       {tabs.map((tab) => (
         <button
           key={tab.tab}
-          className={`flex-1 py-4 text-center relative hover:bg-gray-300 hover:bg-opacity-30  overflow-hidden ${activeTab === tab.tab ? "font-bold" : ""
-            }`}
+          className={`flex-1 py-4 text-center relative hover:bg-gray-300 hover:bg-opacity-30  overflow-hidden ${
+            activeTab === tab.tab ? "font-bold" : ""
+          }`}
           onClick={() => setActiveTab(tab.tab)}
         >
           <span className="inline-block">{tab.tabName}</span>

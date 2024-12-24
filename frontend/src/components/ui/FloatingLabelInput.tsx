@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 type FloatingLabelInputProps = {
   id: string;
   label: string;
-  type: string;
+  type: "text" | "password" | "email";
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   maxLength?: number;
@@ -28,11 +29,19 @@ const FloatingLabelInput = React.forwardRef<
   ) => {
     const [isFocused, setIsFocused] = useState(false);
 
+    const [inputType, setInputType] = useState(type);
+
+    const handlePasswordShowToggle = () => {
+      inputType === "password"
+        ? setInputType("text")
+        : setInputType("password");
+    };
+
     return (
-      <div className="relative w-full">
+      <div className="relative w-full flex items-center">
         <input
           id={id}
-          type={type}
+          type={inputType}
           ref={ref}
           value={value}
           onChange={onChange}
@@ -58,7 +67,26 @@ const FloatingLabelInput = React.forwardRef<
         >
           {label}
         </label>
-        {error && <p className="px-3 text-sm pt-1 text-red-500">{error}</p>}
+        {type === "password" && (
+          <span
+            className="absolute right-3 cursor-pointer"
+            onClick={handlePasswordShowToggle}
+          >
+            {inputType === "password" ? (
+              <AiOutlineEye size={20} />
+            ) : (
+              <AiOutlineEyeInvisible size={20} />
+            )}
+          </span>
+        )}
+        {error && (
+          <p
+            id={`${id}-error`}
+            className="absolute -bottom-6 text-sm text-red-500"
+          >
+            {error}
+          </p>
+        )}
       </div>
     );
   }

@@ -5,7 +5,6 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/ui/Modal";
 import FloatingLabelInput from "../components/ui/FloatingLabelInput";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import {
   signInFailure,
   signInStart,
@@ -26,7 +25,6 @@ const SignIn = () => {
   const [isIdentifierEntered, setIsIdentifierEntered] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordFieldType, setPasswordFieldType] = useState("password");
   const [isInfoEntered, setIsInfoEntered] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -49,16 +47,9 @@ const SignIn = () => {
     setIsIdentifierEntered(false);
     setIdentifier("");
     setPassword("");
-    setPasswordFieldType("password");
     setIsInfoEntered(false);
     setName("");
     setEmail("");
-  };
-
-  const handlePasswordShowToggle = () => {
-    passwordFieldType === "password"
-      ? setPasswordFieldType("text")
-      : setPasswordFieldType("password");
   };
 
   const handleLogin = async (e?: FormEvent) => {
@@ -201,8 +192,9 @@ const SignIn = () => {
                   <button
                     type="submit"
                     onClick={() => setIsIdentifierEntered(true)}
-                    className={`w-full px-5 py-2 ${!identifier ? "bg-gray-400" : "bg-white"
-                      } text-gray-800 font-bold rounded-full mb-16`}
+                    className={`w-full px-5 py-2 ${
+                      !identifier ? "bg-gray-400" : "bg-white"
+                    } text-gray-800 font-bold rounded-full mb-16`}
                     disabled={!identifier}
                   >
                     Next
@@ -225,7 +217,7 @@ const SignIn = () => {
                     {identifier}
                   </div>
                   <div
-                    className="mb-8 flex relative items-center"
+                    className="mb-8"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleLogin(e);
@@ -236,25 +228,16 @@ const SignIn = () => {
                       id="password"
                       ref={passwordInputRef}
                       label="Password"
-                      type={passwordFieldType}
+                      type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                    <span
-                      className="absolute right-3 cursor-pointer"
-                      onClick={handlePasswordShowToggle}
-                    >
-                      {passwordFieldType === "password" ? (
-                        <AiOutlineEye size={20} />
-                      ) : (
-                        <AiOutlineEyeInvisible size={20} />
-                      )}
-                    </span>
                   </div>
                   <button
                     onClick={() => handleLogin()}
-                    className={`w-full px-5 py-2 ${!password ? "bg-gray-400" : "bg-white"
-                      } text-gray-800 font-bold rounded-full`}
+                    className={`w-full px-5 py-2 ${
+                      !password ? "bg-gray-400" : "bg-white"
+                    } text-gray-800 font-bold rounded-full`}
                     disabled={!password}
                   >
                     Log in
@@ -320,8 +303,9 @@ const SignIn = () => {
                   </div>
                   <div className="mb-16">
                     <button
-                      className={`w-full px-5 py-2 ${!name || !email ? "bg-gray-400" : "bg-white"
-                        } text-gray-800 font-bold rounded-full`}
+                      className={`w-full px-5 py-2 ${
+                        !name || !email ? "bg-gray-400" : "bg-white"
+                      } text-gray-800 font-bold rounded-full`}
                       disabled={!name || !email}
                       onClick={() => setIsInfoEntered(true)}
                     >
@@ -333,7 +317,7 @@ const SignIn = () => {
                 <div className="w-[30rem]">
                   <h1 className="text-4xl font-bold mb-8">Set a password</h1>
                   <div
-                    className="mb-8 flex relative items-center"
+                    className="mb-8 flex"
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         handleSignup(e);
@@ -344,25 +328,16 @@ const SignIn = () => {
                       id="password"
                       ref={passwordInputRef}
                       label="Password"
-                      type={passwordFieldType}
+                      type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
-                    <span
-                      className="absolute right-3 cursor-pointer"
-                      onClick={handlePasswordShowToggle}
-                    >
-                      {passwordFieldType === "password" ? (
-                        <AiOutlineEye size={20} />
-                      ) : (
-                        <AiOutlineEyeInvisible size={20} />
-                      )}
-                    </span>
                   </div>
                   <button
                     onClick={handleSignup}
-                    className={`w-full px-5 py-2 ${!password ? "bg-gray-400" : "bg-white"
-                      } text-gray-800 font-bold rounded-full`}
+                    className={`w-full px-5 py-2 ${
+                      !password ? "bg-gray-400" : "bg-white"
+                    } text-gray-800 font-bold rounded-full`}
                     disabled={!password}
                   >
                     Sign Up

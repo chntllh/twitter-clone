@@ -44,17 +44,13 @@ const SecurityUpdate = () => {
           resetValues();
         })
         .catch((error) => {
-          if (error.response.data.message === "Invalid password") {
+          const details = error.data.details;
+          if (details.code === "INVALID_PASSWORD") {
             setPasswordError("Invalid password");
-          } else if (
-            error.response.data.message ===
-            "Old password cannot be the same as old password"
-          ) {
+          } else if (details.code === "PASSWORD_REUSED") {
             setNewPasswordError(
               "Old password cannot be the same as old password"
             );
-          } else {
-            console.error(error);
           }
         });
     }
@@ -106,7 +102,14 @@ const SecurityUpdate = () => {
         <button
           className="bg-blue-500 disabled:bg-blue-400 hover:bg-blue-600 disabled:cursor-not-allowed px-5 py-1 rounded-full"
           onClick={handleSave}
-          disabled={!password || !newPassword || !confirmNewPassword}
+          disabled={
+            !password ||
+            !newPassword ||
+            !confirmNewPassword ||
+            !(passwordError === "") ||
+            !(newPasswordError === "") ||
+            !(confirmNewPasswordError === "")
+          }
         >
           Save
         </button>

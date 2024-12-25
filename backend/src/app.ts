@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import express, { NextFunction, Request, Response } from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { IErrorHandler } from "./middleware/errorHandler";
 
 const logErrorAndExit = (message: string) => {
   console.error("\x1b[31m%s\x1b[0m", message);
@@ -67,20 +68,22 @@ app.use("/api/tweet", tweetRoutes);
 import searchRoutes from "./routes/search.routes";
 app.use("/api/search", searchRoutes);
 
-// Middleware
+// Middleware for errors
 app.use(
   (
-    error: Error & { statusCode?: number },
+    error: Error & IErrorHandler,
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     const statusCode = error.statusCode || 500;
     const message = error.message || "Internal server error";
+    const details = error.details || null;
     res.status(statusCode).json({
       success: false,
       statusCode,
       message,
+      details,
     });
   }
 );

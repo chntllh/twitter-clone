@@ -121,15 +121,31 @@ export const updateUser = async (
     if (password && newPassword) {
       if (await compare(newPassword, user.passwordHash)) {
         return next(
-          errorHandler(400, "Old password cannot be the same as old password")
+          errorHandler(400, "Old password cannot be the same as old password", {
+            code: "PASSWORD_REUSED",
+            description: "Old password cannot be the same as old password",
+            field: "password newPassword",
+          })
         );
       }
       if (newPassword.length < 6) {
-        return next(errorHandler(400, "Password must be over 6 characters"));
+        return next(
+          errorHandler(400, "Password must be over 6 characters", {
+            code: "PASSWORD_TOO_SHORT",
+            description: "Password must be over 6 characters",
+            field: "newPassword",
+          })
+        );
       }
       const validPassword: boolean = await compare(password, user.passwordHash);
       if (!validPassword) {
-        return next(errorHandler(400, "Invalid password"));
+        return next(
+          errorHandler(400, "Invalid password", {
+            code: "INVALID_PASSWORD",
+            description: "Invalid password",
+            field: "password",
+          })
+        );
       } else {
         const hashedPassword: string = await hash(newPassword, 10);
         user.passwordHash = hashedPassword;

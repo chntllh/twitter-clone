@@ -5,19 +5,21 @@ type FloatingLabelTextAreaProps = {
   label: string;
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  rows: number;
+  rows?: number;
   maxLength: number;
   adjustableHeight: boolean;
-}
+  error?: string;
+};
 
 const FloatingLabelTextArea = ({
   id = "",
   label = "",
   value = "",
   onChange,
-  rows = 3,
+  rows = 1,
   maxLength = 50,
   adjustableHeight = false,
+  error = "",
 }: FloatingLabelTextAreaProps) => {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -40,7 +42,7 @@ const FloatingLabelTextArea = ({
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full flex mb-8">
       <textarea
         id={id}
         ref={inputRef}
@@ -53,16 +55,30 @@ const FloatingLabelTextArea = ({
         rows={rows}
         placeholder=""
         className={`peer w-full p-3 h-14 bg-black border border-gray-700 rounded-md outline-none 
-          focus:ring-2 focus:ring-blue-500 pt-6 resize-none overflow-hidden leading-5`}
+          ${
+            error ? "ring-2 ring-red-500" : "focus:ring-2 focus:ring-blue-500"
+          } pt-6 resize-none overflow-hidden leading-5`}
       />
       <label
         htmlFor={id}
         className={`absolute left-3 transition-all duration-300 ease-in-out pointer-events-none 
-          ${isFocused ? "text-blue-500" : "text-gray-500"}
+          ${
+            error
+              ? "text-red-500"
+              : `${isFocused ? "text-blue-500" : "text-gray-500"}`
+          }
           ${isFocused || value ? "top-1 text-xs" : "top-4 text-base"}`}
       >
         {label}
       </label>
+      {error && (
+        <p
+          id={`${id}-error`}
+          className="absolute -bottom-6 left-3 text-sm text-red-500"
+        >
+          {error}
+        </p>
+      )}
     </div>
   );
 };

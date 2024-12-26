@@ -56,45 +56,39 @@ const SecurityUpdate = () => {
 
   return (
     <div className="p-4">
-      <div className="mb-8">
-        <FloatingLabelInput
-          id="password"
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setPasswordError("");
-          }}
-          error={passwordError}
-        />
-      </div>
-      <div className="mb-8">
-        <FloatingLabelInput
-          id="newPassword"
-          label="New Password"
-          type="password"
-          value={newPassword}
-          onChange={(e) => {
-            setNewPassword(e.target.value);
-            setNewPasswordError("");
-          }}
-          error={newPasswordError}
-        />
-      </div>
-      <div className="mb-8">
-        <FloatingLabelInput
-          id="confirmNewPassword"
-          label="Confirm New Password"
-          type="password"
-          value={confirmNewPassword}
-          onChange={(e) => {
-            setConfirmNewPassword(e.target.value);
-            setConfirmNewPasswordError("");
-          }}
-          error={confirmNewPasswordError}
-        />
-      </div>
+      <FloatingLabelInput
+        id="password"
+        label="Password"
+        type="password"
+        value={password}
+        onChange={(e) => {
+          setPassword(e.target.value);
+          setPasswordError("");
+        }}
+        error={passwordError}
+      />
+      <FloatingLabelInput
+        id="newPassword"
+        label="New Password"
+        type="password"
+        value={newPassword}
+        onChange={(e) => {
+          setNewPassword(e.target.value);
+          setNewPasswordError("");
+        }}
+        error={newPasswordError}
+      />
+      <FloatingLabelInput
+        id="confirmNewPassword"
+        label="Confirm New Password"
+        type="password"
+        value={confirmNewPassword}
+        onChange={(e) => {
+          setConfirmNewPassword(e.target.value);
+          setConfirmNewPasswordError("");
+        }}
+        error={confirmNewPasswordError}
+      />
 
       <div className="flex justify-end">
         <button

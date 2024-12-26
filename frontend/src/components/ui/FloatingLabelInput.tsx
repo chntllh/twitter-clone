@@ -38,7 +38,7 @@ const FloatingLabelInput = React.forwardRef<
     };
 
     return (
-      <div className="relative w-full flex items-center">
+      <div className="relative w-full flex items-center mb-8">
         <input
           id={id}
           type={inputType}
@@ -82,7 +82,7 @@ const FloatingLabelInput = React.forwardRef<
         {error && (
           <p
             id={`${id}-error`}
-            className="absolute -bottom-6 text-sm text-red-500"
+            className="absolute -bottom-6 left-3 text-sm text-red-500"
           >
             {error}
           </p>

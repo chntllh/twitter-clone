@@ -138,7 +138,7 @@ export const google = async (
         displayName: name,
         passwordHash: hashedPassword,
         email: email,
-        avatarUrl: googlePhotoUrl,
+        avatarUrl: googlePhotoUrl.replace(/s96-c/, "s400-c"),
       }).save();
 
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET!);

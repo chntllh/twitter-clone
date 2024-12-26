@@ -23,10 +23,6 @@ const SecurityUpdate = () => {
       setConfirmNewPasswordError("Passwords do not match");
       return false;
     }
-    if (newPassword.length < 6) {
-      setNewPasswordError("Password must be over 6 characters");
-      return false;
-    }
 
     setNewPasswordError("");
     setPasswordError("");
@@ -45,12 +41,14 @@ const SecurityUpdate = () => {
         })
         .catch((error) => {
           const details = error.data.details;
-          if (details.code === "INVALID_PASSWORD") {
+          if (details.code === "INVALID_OLD_PASSWORD") {
             setPasswordError("Invalid password");
           } else if (details.code === "PASSWORD_REUSED") {
             setNewPasswordError(
               "Old password cannot be the same as old password"
             );
+          } else if (details.code === "PASSWORD_TOO_SHORT") {
+            setNewPasswordError("Password must be over 6 characters");
           }
         });
     }

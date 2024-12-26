@@ -1,6 +1,6 @@
 export interface IErrorDetails {
-  code: string;
-  description: string;
+  code?: string;
+  description?: string;
   field?: string;
 }
 

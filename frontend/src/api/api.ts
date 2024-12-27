@@ -11,6 +11,14 @@ export const login = (identifier: string, password: string) => {
   });
 };
 
+export const preLogin = (identifier: string) => {
+  return apiClient.post("/api/auth/prelogin", { identifier });
+};
+
+export const preRegister = (email: string, name: string) => {
+  return apiClient.post("/api/auth/preregister", { email, name });
+};
+
 export const signup = (email: string, name: string, password: string) => {
   return apiClient.post("/api/auth/register", {
     email,

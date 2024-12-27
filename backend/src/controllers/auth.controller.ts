@@ -6,6 +6,10 @@ import User, { InterfaceUser } from "../models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { FormattedUser } from "../types/user.interface";
 import { formatUser } from "../helper/formatUser";
+import {
+  validateDisplayName,
+  validateEmail,
+} from "../helper/validateUserFields";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -57,6 +61,34 @@ export const register = async (
   }
 };
 
+export const preRegister = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { name, email } = req.body;
+
+  if (!email || !name) {
+    return next(
+      errorHandler(400, "All fields are required", {
+        code: "FIELD_NOT_PROVIDED",
+        description: "Name or Email not provided",
+        field: "email name",
+      })
+    );
+  }
+
+  try {
+    await validateEmail(email, null);
+
+    await validateDisplayName(name);
+
+    res.status(200).json({ message: "Valid name and email" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const login = async (
   req: Request,
   res: Response,
@@ -65,7 +97,13 @@ export const login = async (
   const { identifier, password } = req.body;
 
   if (!identifier || !password) {
-    return next(errorHandler(400, "All fields are required"));
+    return next(
+      errorHandler(400, "All fields are required", {
+        code: "FIELD_NOT_PROVIDED",
+        description: "Email/username or password not provided",
+        field: "identifier password",
+      })
+    );
   }
 
   const isEmail: boolean = emailRegex.test(identifier);
@@ -75,7 +113,13 @@ export const login = async (
       isEmail ? { email: identifier } : { username: identifier }
     );
     if (!validUser) {
-      return next(errorHandler(400, "Invalid email/username or password"));
+      return next(
+        errorHandler(400, "Invalid email/username", {
+          code: "USER_NOT_FOUND",
+          description: "User not found",
+          field: "identifier",
+        })
+      );
     }
 
     const validPassword: boolean = await bcryptjs.compare(
@@ -83,7 +127,13 @@ export const login = async (
       validUser.passwordHash
     );
     if (!validPassword) {
-      return next(errorHandler(400, "Invalid email/username or password"));
+      return next(
+        errorHandler(400, "Invalid email/username or password", {
+          code: "PASSWORD_ERROR",
+          description: "Password provided is incorrect",
+          field: "password",
+        })
+      );
     }
 
     const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET!);
@@ -98,6 +148,47 @@ export const login = async (
         maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const preLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  const { identifier } = req.body;
+
+  if (!identifier) {
+    return next(
+      errorHandler(400, "Identifier is required", {
+        code: "FIELD_NOT_PROVIDED",
+        description: "Email or username not provided",
+        field: "identifier",
+      })
+    );
+  }
+
+  const isEmail: boolean = emailRegex.test(identifier);
+
+  try {
+    const validUser = await User.findOne(
+      isEmail ? { email: identifier } : { username: identifier }
+    );
+    if (!validUser) {
+      return next(
+        errorHandler(400, "Email/username not found", {
+          code: "USER_NOT_FOUND",
+          description: "User not found",
+          field: "identifier",
+        })
+      );
+    }
+
+    res
+      .status(200)
+      .json({ message: `${isEmail ? "Valid email." : "Valid username"}` });
   } catch (error) {
     next(error);
   }

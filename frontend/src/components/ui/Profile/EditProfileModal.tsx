@@ -205,7 +205,6 @@ const EditProfileModal = ({ isOpen, onClose, user }: EditProfileModalProps) => {
                 label="Bio"
                 value={newBio}
                 maxLength={160}
-                rows={3}
                 onChange={(e) => setNewBio(e.target.value)}
                 adjustableHeight={true}
               />

@@ -50,7 +50,10 @@ export const validateUsername = async (
   }
 };
 
-export const validateEmail = async (email: string, userId: Types.ObjectId) => {
+export const validateEmail = async (
+  email: string,
+  userId: Types.ObjectId | null
+) => {
   if (!EMAIL_REGEX.test(email)) {
     throw errorHandler(400, "Invalid email format", {
       code: "INVALID_EMAIL",

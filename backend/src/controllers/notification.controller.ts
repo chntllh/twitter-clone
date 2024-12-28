@@ -4,13 +4,13 @@ import { resolveUserId } from "../helper/resolveUserId";
 import Notification from "../models/notification.model";
 import { fetchTweetsAndRetweets } from "../helper/fetchTweetsAndRetweets";
 
-export const getNotification = async (
+export const getMentionNotification = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const userId = await resolveUserId(req.params.identifier);
+    const userId = req.user!.id;
 
     const notifications = await Notification.find({ userId }).select(
       "tweetId actorId"

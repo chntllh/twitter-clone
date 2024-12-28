@@ -126,3 +126,8 @@ export const unretweetTweet = (tweetId: string) => {
 export const getHashtagTweets = (hashtag: string) => {
   return apiClient.get<Tweet[]>(`/api/search/hashtagtweets/${hashtag}`);
 };
+
+// Notifications
+export const getUserNotifications = () => {
+  return apiClient.get<Tweet[]>("/api/search/notifications/mentions");
+};

@@ -15,7 +15,13 @@ export const protect = (
     req.cookies.access_token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
-    return next(errorHandler(401, "Unauthorized: No token provided"));
+    return next(
+      errorHandler(401, "Unauthorized: No token provided", {
+        code: "NO_TOKEN",
+        description: "No token in request",
+        field: "token",
+      })
+    );
   }
 
   jwt.verify(
@@ -24,7 +30,11 @@ export const protect = (
     (err: jwt.VerifyErrors | null, user: JwtPayload | string | undefined) => {
       if (err) {
         return next(
-          errorHandler(401, "Unauthorized: Invalid or expired token")
+          errorHandler(401, "Unauthorized: Invalid or expired token", {
+            code: "INVALID_TOKEN",
+            description: "Token invalid or token expired",
+            field: "token",
+          })
         );
       }
       req.user = user;

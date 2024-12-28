@@ -16,7 +16,7 @@ const LabelledSelectorTabs = ({
           <span className="inline-block">{tab.tabName}</span>
           {activeTab === tab.tab && (
             <div className="absolute h-1 text-transparent pt-1 bottom-0 left-1/2 transform -translate-x-1/2 bg-blue-500 rounded-full">
-              {tab.tabName}
+              {tab.tabName.length > 5 ? tab.tabName : <div className="w-12" />}
             </div>
           )}
         </button>

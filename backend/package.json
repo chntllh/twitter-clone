@@ -1,11 +1,12 @@
 {
-  "name": "test",
+  "name": "backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/app.ts",
   "scripts": {
     "start": "tsc && node dist/app.js",
     "dev": "NODE_ENV=test ts-node-dev --respawn src/app.ts",
-    "dev-on": "ts-node-dev --respawn src/app.ts"
+    "dev-on": "ts-node-dev --respawn src/app.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",

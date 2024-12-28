@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 type FloatingLabelInputProps = {
@@ -30,6 +30,10 @@ const FloatingLabelInput = React.forwardRef<
     const [isFocused, setIsFocused] = useState(false);
 
     const [inputType, setInputType] = useState(type);
+
+    useEffect(() => {
+      setInputType(type);
+    }, [type]);
 
     const handlePasswordShowToggle = () => {
       inputType === "password"

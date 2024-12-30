@@ -21,11 +21,23 @@ export const register = async (
   const { email, name, password } = req.body;
 
   if (!email || !name || !password) {
-    return next(errorHandler(400, "All fields are required"));
+    return next(
+      errorHandler(400, "All fields are required", {
+        code: "MISSING_FIELDS",
+        description: "Email, name or password is missing",
+        field: "email name password",
+      })
+    );
   }
 
   if (!emailRegex.test(email)) {
-    return next(errorHandler(400, "Invalid email format"));
+    return next(
+      errorHandler(400, "Invalid email format", {
+        code: "INVALID_EMAIL",
+        description: "Invalid email format",
+        field: "email",
+      })
+    );
   }
 
   const randomSuffix = crypto.randomBytes(3).toString("hex");
@@ -55,7 +67,13 @@ export const register = async (
       .json(userData);
   } catch (error: any) {
     if (error.code === 11000) {
-      return next(errorHandler(409, "Email already exists"));
+      return next(
+        errorHandler(409, "Email already exists", {
+          code: "EMAIL_EXISTS",
+          description: "Email already exists in DB",
+          field: "email",
+        })
+      );
     }
     next(error);
   }

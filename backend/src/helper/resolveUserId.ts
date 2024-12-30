@@ -6,7 +6,11 @@ export const resolveUserId = async (
   identifier: string | undefined
 ): Promise<mongoose.Types.ObjectId> => {
   if (!identifier) {
-    throw errorHandler(404, "No identifier");
+    throw errorHandler(404, "No identifier", {
+      code: "NO_IDENTIFIER",
+      description: "No identifier provided",
+      field: "identifier",
+    });
   }
 
   let user: { _id: mongoose.Types.ObjectId } | null;
@@ -22,7 +26,11 @@ export const resolveUserId = async (
   }
 
   if (!user) {
-    throw errorHandler(404, "No user");
+    throw errorHandler(404, "No user", {
+      code: "NO_USER",
+      description: "User does not exist in DB",
+      field: "user",
+    });
   }
 
   return user._id;

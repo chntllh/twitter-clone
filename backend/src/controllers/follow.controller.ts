@@ -41,7 +41,13 @@ export const follow = async (
     res.status(200).json(follow);
   } catch (error: any) {
     if (error.code === 11000) {
-      return next(errorHandler(409, "Duplicate follow request"));
+      return next(
+        errorHandler(409, "Duplicate follow request", {
+          code: "DUPLICATE_REQUEST",
+          description: "Duplicate follow request",
+          field: "userId",
+        })
+      );
     }
     next(error);
   }
@@ -63,7 +69,13 @@ export const unfollow = async (
     });
 
     if (!deleteFollow) {
-      return next(errorHandler(404, "Follow not found for user"));
+      return next(
+        errorHandler(404, "Follow not found for user", {
+          code: "FOLLOW_NOT_FOUND",
+          description: "Follow not found for user",
+          field: "userId",
+        })
+      );
     }
 
     await updateFollowCounts(userId, req.user!.id, false);

@@ -11,12 +11,24 @@ const validateTweetId = async (
   next: NextFunction
 ): Promise<void> => {
   if (!tweetId || !isValidObjectId(tweetId)) {
-    return next(errorHandler(404, "Invalid or missing tweet ID"));
+    return next(
+      errorHandler(404, "Invalid or missing tweet ID", {
+        code: "TWEETID_ERROR",
+        description: "Invalid or missing tweet ID",
+        field: "tweetId",
+      })
+    );
   }
 
   const tweetExists = await Tweet.exists({ _id: tweetId });
   if (!tweetExists) {
-    return next(errorHandler(404, "Tweet not found"));
+    return next(
+      errorHandler(404, "Tweet not found", {
+        code: "TWEET_NOT_FOUND",
+        description: "Tweet not found",
+        field: "tweet",
+      })
+    );
   }
 };
 
@@ -47,7 +59,13 @@ export const likeTweet = async (
     res.status(200).json({ body: like });
   } catch (error: any) {
     if (error.code === 11000) {
-      return next(errorHandler(409, "Duplicate like request"));
+      return next(
+        errorHandler(409, "Duplicate like request", {
+          code: "DUPLICATE_LIKE",
+          description: "Duplicate like request",
+          field: "like",
+        })
+      );
     }
     next(error);
   }
@@ -69,7 +87,13 @@ export const unlikeTweet = async (
     });
 
     if (!like) {
-      return next(errorHandler(404, "Like not found for tweet"));
+      return next(
+        errorHandler(404, "Like not found for tweet", {
+          code: "LIKE_NOT_FOUND",
+          description: "Like not found for tweet",
+          field: "like",
+        })
+      );
     }
 
     await updateTweetCount(tweetId, "likesCount", -1);
@@ -99,7 +123,13 @@ export const retweetTweet = async (
     res.status(200).json({ body: retweet });
   } catch (error: any) {
     if (error.code === 11000) {
-      return next(errorHandler(409, "Duplicate retweet request"));
+      return next(
+        errorHandler(409, "Duplicate retweet request", {
+          code: "DUPLICATE_RETWEET",
+          description: "Duplicate retweet request",
+          field: "retweet",
+        })
+      );
     }
     next(error);
   }
@@ -120,7 +150,13 @@ export const unretweetTweet = async (
     });
 
     if (!retweet) {
-      return next(errorHandler(404, "Retweet not found for tweet"));
+      return next(
+        errorHandler(404, "Retweet not found for tweet", {
+          code: "RETWEET_NOT_FOUND",
+          description: "Retweet not found for tweet",
+          field: "retweet",
+        })
+      );
     }
 
     await updateTweetCount(tweetId, "retweetCount", -1);

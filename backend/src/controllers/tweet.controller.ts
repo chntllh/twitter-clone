@@ -29,7 +29,14 @@ export const postTweet = async (
 
     const { content, imageUrl } = req.body;
 
-    if (!content) return next(errorHandler(400, "Content empty"));
+    if (!content)
+      return next(
+        errorHandler(400, "Content empty", {
+          code: "CONTENT_EMPTY",
+          description: "Content of post empty",
+          field: "content",
+        })
+      );
 
     const tweetData = {
       userId: req.user!.id,
@@ -56,7 +63,13 @@ export const postTweet = async (
       }
     } catch (error) {
       await session.abortTransaction();
-      return next(errorHandler(500, "Error saving hashtags"));
+      return next(
+        errorHandler(500, "Error saving hashtags", {
+          code: "HASHTAG_ERROR",
+          description: "Error saving hashtags",
+          field: "hashtag",
+        })
+      );
     }
 
     try {
@@ -88,7 +101,13 @@ export const postTweet = async (
       }
     } catch (error) {
       await session.abortTransaction();
-      return next(errorHandler(500, "Error saving mentions"));
+      return next(
+        errorHandler(500, "Error saving mentions", {
+          code: "MENTION_ERROR",
+          description: "Error saving mentions",
+          field: "mention",
+        })
+      );
     }
 
     await session.commitTransaction();
@@ -103,7 +122,14 @@ export const postTweet = async (
       )
       .lean();
 
-    if (!populatedTweet) return next(errorHandler(404, "Tweet not found"));
+    if (!populatedTweet)
+      return next(
+        errorHandler(404, "Tweet not found", {
+          code: "TWEET_NOT_FOUND",
+          description: "Tweet not found",
+          field: "tweet",
+        })
+      );
 
     const formattedTweet: FormattedTweet = formatTweet(populatedTweet);
 

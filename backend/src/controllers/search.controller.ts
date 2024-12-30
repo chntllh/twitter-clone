@@ -37,7 +37,13 @@ export const getHashtagTweets = async (
   const { hashtag } = req.params;
 
   if (!hashtag || hashtag === "") {
-    return next(errorHandler(400, "No hashtag given"));
+    return next(
+      errorHandler(400, "No hashtag given", {
+        code: "HASHTAG_NOT_PROVIDED",
+        description: "Hashtag not provided",
+        field: "hashtag",
+      })
+    );
   }
 
   try {

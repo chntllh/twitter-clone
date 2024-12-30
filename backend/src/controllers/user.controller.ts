@@ -24,7 +24,13 @@ export const getUser = async (
     const { identifier } = req.params;
 
     if (!identifier) {
-      return next(errorHandler(404, "No identifier"));
+      return next(
+        errorHandler(404, "No identifier", {
+          code: "NO_IDENTIFIER",
+          description: "No identifier provided",
+          field: "identifier",
+        })
+      );
     }
 
     let query = isValidObjectId(identifier)
@@ -34,7 +40,13 @@ export const getUser = async (
     const user = await User.findOne(query);
 
     if (!user) {
-      return next(errorHandler(404, "No user found"));
+      return next(
+        errorHandler(404, "No user found", {
+          code: "NO_USER",
+          description: "User does not exist in DB",
+          field: "user",
+        })
+      );
     }
 
     res.status(200).json(formatUser(user));
@@ -49,7 +61,13 @@ export const updateUser = async (
   next: NextFunction
 ): Promise<void> => {
   if (!req.user) {
-    return next(errorHandler(404, "Not valid user"));
+    return next(
+      errorHandler(404, "Not valid user", {
+        code: "INVALID_USER",
+        description: "No valid user",
+        field: "req.user",
+      })
+    );
   }
 
   try {

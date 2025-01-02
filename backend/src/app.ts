@@ -10,28 +10,20 @@ const logErrorAndExit = (message: string) => {
   process.exit(1);
 };
 
-dotenv.config({ path: "../.env" });
+dotenv.config({
+  path: process.env.NODE_ENV === "test" ? "../.env.test" : "../.env",
+});
 
 if (!process.env.JWT_SECRET) {
   logErrorAndExit("JWT_SECRET is missing in the environment variables.");
 }
 
-let mongoUri: string;
-
-if (process.env.NODE_ENV === "test") {
-  if (!process.env.TEST_URI) {
-    logErrorAndExit("TEST_URI is missing in the environment variables.");
-  }
-  mongoUri = process.env.TEST_URI as string;
-} else {
-  if (!process.env.MONGO_URI) {
-    logErrorAndExit("MONGO_URI is missing in the environment variables.");
-  }
-  mongoUri = process.env.MONGO_URI as string;
+if (!process.env.MONGO_URI) {
+  logErrorAndExit("MONGO_URI is missing in the environment variables.");
 }
 
 mongoose
-  .connect(mongoUri)
+  .connect(process.env.MONGO_URI as string)
   .then(() => console.log("\x1b[33m%s\x1b[0m", "MongoDB connected!"))
   .catch((err: any) => console.log(err));
 

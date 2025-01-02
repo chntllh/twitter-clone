@@ -141,56 +141,30 @@ export const postTweet = async (
   }
 };
 
-export const getAllTweets = async (
+export const getTweets = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const formattedTweets = await fetchTweetsAndRetweets({}, req.user!.id);
+    const { type, identifier } = req.query;
 
-    res.status(200).json(formattedTweets);
-  } catch (error) {
-    next(error);
-  }
-};
+    let filter = {};
 
-export const getUserTweets = async (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const userId = await resolveUserId(req.params.identifier);
-    const formattedTweets = await fetchTweetsAndRetweets(
-      { userId },
-      req.user!.id
-    );
+    if (type === "user" && identifier) {
+      const userId = await resolveUserId(identifier as string);
+      filter = { userId };
+    } else if (type === "following" && identifier) {
+      const userId = await resolveUserId(identifier as string);
+      const following = await Follower.find({ followerId: userId })
+        .select("userId")
+        .lean();
+      const followingUserIds = following.map((follow) => follow.userId);
+      filter = { userId: { $in: followingUserIds } };
+    }
 
-    res.status(200).json(formattedTweets);
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const getUserFollowingTweets = async (
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
-  try {
-    const userId = await resolveUserId(req.params.identifier);
-    const following = await Follower.find({ followerId: userId })
-      .select("userId")
-      .lean();
-
-    const followingUserIds = following.map((follow) => follow.userId);
-    const formattedTweets = await fetchTweetsAndRetweets(
-      { userId: { $in: followingUserIds } },
-      req.user!.id
-    );
-
-    res.status(200).json(formattedTweets);
+    const formattedTweet = await fetchTweetsAndRetweets(filter, req.user!.id);
+    res.status(200).json(formattedTweet);
   } catch (error) {
     next(error);
   }

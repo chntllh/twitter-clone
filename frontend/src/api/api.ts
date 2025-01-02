@@ -70,10 +70,6 @@ export const getIsFollowing = (userId: string) => {
   return apiClient.get<boolean>(`/api/user/${userId}/is-following`);
 };
 
-export const getUserTweets = (userId: string) => {
-  return apiClient.get(`/api/user/${userId}/usertweets`);
-};
-
 // Combined request for hovercards
 type GetUserAndIsFollowingResponse = {
   user: AppUser;
@@ -99,13 +95,30 @@ export const postTweet = (postData: Partial<Post>) => {
 };
 
 export const getAllTweets = () => {
-  return apiClient.get<Tweet[]>("/api/tweet/all");
+  return apiClient.get<Tweet[]>("/api/tweet/", {
+    params: {},
+  });
+};
+
+export const getUserTweets = (userId: string) => {
+  return apiClient.get<Tweet[]>("/api/tweet/", {
+    params: {
+      type: "user",
+      identifier: userId,
+    },
+  });
 };
 
 export const getUserFollowingTweets = (userId: string) => {
-  return apiClient.get<Tweet[]>(`/api/user/${userId}/followingtweets`);
+  return apiClient.get<Tweet[]>("/api/tweet", {
+    params: {
+      type: "following",
+      identifier: userId,
+    },
+  });
 };
 
+// Tweet Actions
 export const likeTweet = (tweetId: string) => {
   return apiClient.post(`/api/tweet/${tweetId}/like`);
 };

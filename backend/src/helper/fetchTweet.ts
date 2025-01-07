@@ -1,6 +1,6 @@
 import Tweet from "../models/tweet.model";
 import { InterfaceUser } from "../models/user.model";
-import { TweetFilter } from "../types/global";
+import { TweetFilter } from "../types/filter.interface";
 
 export const fetchTweet = async (filter: TweetFilter) => {
   return await Tweet.find(filter)

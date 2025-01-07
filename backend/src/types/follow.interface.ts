@@ -1,5 +1,7 @@
+import mongoose from "mongoose";
+
 export interface FormattedRelation {
-  userId: string;
+  userId: mongoose.Types.ObjectId;
   username: string;
   avatarUrl: string | undefined;
   displayName: string;

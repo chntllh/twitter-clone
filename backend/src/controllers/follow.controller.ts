@@ -1,11 +1,10 @@
-import mongoose, { ObjectId } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
-import Follower from "../models/follower.model";
+import Follower, { InterfaceFollower } from "../models/follower.model";
 import { NextFunction, Request, Response } from "express";
 import User, { InterfaceUser } from "../models/user.model";
 import { resolveUserId } from "../helper/resolveUserId";
-import { CustomRequest } from "../types/request.interface";
 import { FormattedRelation } from "../types/follow.interface";
+import mongoose from "mongoose";
 
 const updateFollowCounts = async (
   userId: mongoose.Types.ObjectId,
@@ -22,7 +21,7 @@ const updateFollowCounts = async (
 };
 
 export const follow = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -33,10 +32,10 @@ export const follow = async (
 
     const follow = await new Follower({
       userId,
-      followerId: req.user!.id,
+      followerId: req.user,
     }).save();
 
-    await updateFollowCounts(userId, req.user!.id, true);
+    await updateFollowCounts(userId, req.user, true);
 
     res.status(200).json(follow);
   } catch (error: any) {
@@ -54,7 +53,7 @@ export const follow = async (
 };
 
 export const unfollow = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -65,7 +64,7 @@ export const unfollow = async (
 
     const deleteFollow = await Follower.findOneAndDelete({
       userId: userId,
-      followerId: req.user!.id,
+      followerId: req.user,
     });
 
     if (!deleteFollow) {
@@ -78,7 +77,7 @@ export const unfollow = async (
       );
     }
 
-    await updateFollowCounts(userId, req.user!.id, false);
+    await updateFollowCounts(userId, req.user, false);
 
     res.status(200).json({ message: "Unfollowed successfully" });
   } catch (error) {
@@ -105,7 +104,7 @@ export const followers = async (
 
     const formattedFollowers: FormattedRelation[] = followers.map(
       (follower) => ({
-        userId: follower.followerId._id.toString(),
+        userId: follower.followerId._id as mongoose.Types.ObjectId,
         username: follower.followerId.username,
         displayName: follower.followerId.displayName,
         avatarUrl: follower.followerId.avatarUrl,
@@ -137,7 +136,7 @@ export const following = async (
       .lean();
 
     const formattedFollowings: FormattedRelation[] = follows.map((follow) => ({
-      userId: follow.userId._id.toString(),
+      userId: follow.userId._id as mongoose.Types.ObjectId,
       username: follow.userId.username,
       displayName: follow.userId.displayName,
       avatarUrl: follow.userId.avatarUrl,
@@ -151,7 +150,7 @@ export const following = async (
 };
 
 export const isFollowing = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -160,9 +159,9 @@ export const isFollowing = async (
       req.params.identifier
     );
 
-    const followExists = await Follower.findOne({
+    const followExists: InterfaceFollower | null = await Follower.findOne({
       userId,
-      followerId: req.user!.id,
+      followerId: req.user,
     });
 
     res.status(200).json(!!followExists);

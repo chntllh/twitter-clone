@@ -2,32 +2,32 @@ import { NextFunction, Request, Response } from "express";
 import { errorHandler } from "../middleware/errorHandler";
 import User, { InterfaceUser } from "../models/user.model";
 import { resolveUserId } from "../helper/resolveUserId";
-import Tweet from "../models/tweet.model";
+import Tweet, { InterfaceTweet } from "../models/tweet.model";
 import Follower from "../models/follower.model";
-import { extractHashtags } from "../helper/extractHashtags";
+import { extractHashtags } from "../utils/extractHashtags";
 import Hashtag from "../models/hashtag.model";
 import TweetHashtag from "../models/tweet-hashtag.model";
-import { CustomRequest } from "../types/request.interface";
 import { FormattedTweet } from "../types/tweet.interface";
-import { formatTweet } from "../helper/formatTweet";
+import { formatTweet } from "../utils/formatTweet";
 import { fetchTweetsAndRetweets } from "../helper/fetchTweetsAndRetweets";
-import { extractMentions } from "../helper/extractMentions";
+import { extractMentions } from "../utils/extractMentions";
 import Mention from "../models/mention.model";
 import Notification from "../models/notification.model";
-import { startSession } from "mongoose";
+import mongoose from "mongoose";
 
 export const postTweet = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const session = await startSession();
-  let transactionCommitted = false;
+  const session: mongoose.mongo.ClientSession = await mongoose.startSession();
+  let transactionCommitted: boolean = false;
 
   try {
     session.startTransaction();
 
-    const { content, imageUrl } = req.body;
+    const { content, imageUrl }: { content: string; imageUrl: string } =
+      req.body;
 
     if (!content)
       return next(
@@ -38,16 +38,16 @@ export const postTweet = async (
         })
       );
 
-    const tweetData = {
-      userId: req.user!.id,
+    const tweetData: Partial<InterfaceTweet> = {
+      userId: req.user,
       content,
       ...(imageUrl && { imageUrl }),
     };
 
-    const tweet = await new Tweet(tweetData).save({ session });
+    const tweet: InterfaceTweet = await new Tweet(tweetData).save({ session });
 
     try {
-      const hashtags = extractHashtags(content);
+      const hashtags: string[] = extractHashtags(content);
 
       for (const tag of hashtags) {
         const hashtagDoc = await Hashtag.findOneAndUpdate(
@@ -73,7 +73,7 @@ export const postTweet = async (
     }
 
     try {
-      const mentions = extractMentions(content);
+      const mentions: string[] = extractMentions(content);
 
       if (mentions) {
         const mentionedUsernames = mentions.map((mention): string =>
@@ -93,7 +93,7 @@ export const postTweet = async (
 
           await new Notification({
             userId: user._id,
-            actorId: req.user!.id,
+            actorId: req.user,
             tweetId: tweet._id,
             notificationType: "Tweet mention",
           }).save({ session });
@@ -142,7 +142,7 @@ export const postTweet = async (
 };
 
 export const getTweets = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -152,10 +152,14 @@ export const getTweets = async (
     let filter = {};
 
     if (type === "user" && identifier) {
-      const userId = await resolveUserId(identifier as string);
+      const userId: mongoose.Types.ObjectId = await resolveUserId(
+        identifier as string
+      );
       filter = { userId };
     } else if (type === "following" && identifier) {
-      const userId = await resolveUserId(identifier as string);
+      const userId: mongoose.Types.ObjectId = await resolveUserId(
+        identifier as string
+      );
       const following = await Follower.find({ followerId: userId })
         .select("userId")
         .lean();
@@ -163,7 +167,7 @@ export const getTweets = async (
       filter = { userId: { $in: followingUserIds } };
     }
 
-    const formattedTweet = await fetchTweetsAndRetweets(filter, req.user!.id);
+    const formattedTweet = await fetchTweetsAndRetweets(filter, req.user);
     res.status(200).json(formattedTweet);
   } catch (error) {
     next(error);

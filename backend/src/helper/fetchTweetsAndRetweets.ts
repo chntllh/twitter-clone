@@ -1,16 +1,16 @@
-import { Types } from "mongoose";
 import Like from "../models/like.model";
 import Retweet from "../models/retweet.model";
 import { FormattedTweet } from "../types/tweet.interface";
 import { fetchTweet } from "./fetchTweet";
 import { fetchUser } from "./fetchUser";
-import { formatTweet } from "./formatTweet";
-import { mergeTweetsAndRetweets } from "./mergeTweetsAndRetweets";
-import { TweetFilter } from "../types/global";
+import { formatTweet } from "../utils/formatTweet";
+import { mergeTweetsAndRetweets } from "../utils/mergeTweetsAndRetweets";
+import mongoose from "mongoose";
+import { TweetFilter } from "../types/filter.interface";
 
 export const fetchTweetsAndRetweets = async (
   filter: TweetFilter,
-  userId: Types.ObjectId
+  userId: mongoose.Types.ObjectId
 ) => {
   const [tweets, retweets, likesUser, retweetsUser] = await Promise.all([
     fetchTweet(filter),

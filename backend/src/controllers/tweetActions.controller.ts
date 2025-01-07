@@ -1,16 +1,15 @@
 import { NextFunction, Request, Response } from "express";
-import { isValidObjectId } from "mongoose";
+import mongoose from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
 import Like from "../models/like.model";
 import Tweet from "../models/tweet.model";
 import Retweet from "../models/retweet.model";
-import { CustomRequest } from "../types/request.interface";
 
 const validateTweetId = async (
   tweetId: string,
   next: NextFunction
 ): Promise<void> => {
-  if (!tweetId || !isValidObjectId(tweetId)) {
+  if (!tweetId || !mongoose.isValidObjectId(tweetId)) {
     return next(
       errorHandler(404, "Invalid or missing tweet ID", {
         code: "TWEETID_ERROR",
@@ -41,16 +40,16 @@ const updateTweetCount = async (
 };
 
 export const likeTweet = async (
-  req: CustomRequest,
+  req: Request<{ tweetId: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { tweetId } = req.params;
+    const { tweetId }: { tweetId: string } = req.params;
     await validateTweetId(tweetId, next);
 
     const like = await new Like({
-      userId: req.user!.id,
+      userId: req.user,
       tweetId: tweetId,
     }).save();
 
@@ -72,17 +71,17 @@ export const likeTweet = async (
 };
 
 export const unlikeTweet = async (
-  req: CustomRequest,
+  req: Request<{ tweetId: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { tweetId } = req.params;
+    const { tweetId }: { tweetId: string } = req.params;
 
     await validateTweetId(tweetId, next);
 
     const like = await Like.findOneAndDelete({
-      userId: req.user!.id,
+      userId: req.user,
       tweetId: tweetId,
     });
 
@@ -105,16 +104,16 @@ export const unlikeTweet = async (
 };
 
 export const retweetTweet = async (
-  req: CustomRequest,
+  req: Request<{ tweetId: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { tweetId } = req.params;
+    const { tweetId }: { tweetId: string } = req.params;
     await validateTweetId(tweetId, next);
 
     const retweet = await new Retweet({
-      userId: req.user!.id,
+      userId: req.user,
       tweetId: tweetId,
     }).save();
 
@@ -136,16 +135,16 @@ export const retweetTweet = async (
 };
 
 export const unretweetTweet = async (
-  req: CustomRequest,
+  req: Request<{ tweetId: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
-    const { tweetId } = req.params;
+    const { tweetId }: { tweetId: string } = req.params;
     await validateTweetId(tweetId, next);
 
     const retweet = await Retweet.findOneAndDelete({
-      userId: req.user!.id,
+      userId: req.user,
       tweetId: tweetId,
     });
 

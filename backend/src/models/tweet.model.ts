@@ -1,7 +1,7 @@
-import { Document, model, Model, Schema } from "mongoose";
+import mongoose, { Document, model, Model, Schema } from "mongoose";
 
 export interface InterfaceTweet extends Document {
-  userId: Schema.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   content: string;
   imageUrl?: string;
   likesCount: number;

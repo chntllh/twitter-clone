@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import User from "../models/user.model";
-import { isValidObjectId, Types } from "mongoose";
+import mongoose, { isValidObjectId, Types } from "mongoose";
 import { errorHandler } from "../middleware/errorHandler";
-import { compare, hash } from "bcryptjs";
+import { hash } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { FormattedUser } from "../types/user.interface";
-import { formatUser } from "../helper/formatUser";
-import { CustomRequest } from "../types/request.interface";
+import { formatUser } from "../utils/formatUser";
 import {
   validateBio,
   validateDisplayName,
@@ -56,7 +55,7 @@ export const getUser = async (
 };
 
 export const updateUser = async (
-  req: CustomRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -71,7 +70,7 @@ export const updateUser = async (
   }
 
   try {
-    const userId: Types.ObjectId = req.user.id;
+    const userId: mongoose.Types.ObjectId = req.user;
     const {
       username,
       email,

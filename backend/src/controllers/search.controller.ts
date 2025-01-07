@@ -1,15 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import Hashtag from "../models/hashtag.model";
+import Hashtag, { InterfaceHashtag } from "../models/hashtag.model";
 import TweetHashtag from "../models/tweet-hashtag.model";
 import { errorHandler } from "../middleware/errorHandler";
 import Tweet from "../models/tweet.model";
 import { InterfaceUser } from "../models/user.model";
 import Like from "../models/like.model";
 import { FormatHashtag } from "../types/search.interface";
-import { CustomRequest } from "../types/request.interface";
-import { formatTweet } from "../helper/formatTweet";
+import { formatTweet } from "../utils/formatTweet";
 import { FormattedTweet } from "../types/tweet.interface";
-import { formatHashtag } from "../helper/formatHashtag";
+import { formatHashtag } from "../utils/formatHashtag";
 
 export const getAllHashtags = async (
   req: Request,
@@ -30,7 +29,7 @@ export const getAllHashtags = async (
 };
 
 export const getHashtagTweets = async (
-  req: CustomRequest,
+  req: Request<{ hashtag: string }>,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
@@ -47,7 +46,7 @@ export const getHashtagTweets = async (
   }
 
   try {
-    const hashtagDoc = await Hashtag.findOne(
+    const hashtagDoc: InterfaceHashtag | null = await Hashtag.findOne(
       { hashtag: `#${hashtag.trim().toLowerCase()}` },
       { _id: 1 }
     );
@@ -73,7 +72,7 @@ export const getHashtagTweets = async (
       .sort("-createdAt")
       .lean();
 
-    const likes = await Like.find({ userId: req.user!.id }).select("tweetId");
+    const likes = await Like.find({ userId: req.user }).select("tweetId");
     const userLikes = new Set(likes.map((like) => like.tweetId.toString()));
 
     const formattedTweets: FormattedTweet[] = tweets.map((tweet) => ({

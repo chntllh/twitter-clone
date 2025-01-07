@@ -1,10 +1,9 @@
-import { Types } from "mongoose";
-import { FilterQuery } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
-export type TweetFilter = FilterQuery<{
-  userId?: Types.ObjectId | { $in: Types.ObjectId[] };
-}>;
-
-export type UserFilter = FilterQuery<{
-  _id: Types.ObjectId | { $in: Types.ObjectId[] };
-}>;
+declare global {
+  namespace Express {
+    interface Request {
+      user: mongoose.Types.ObjectId;
+    }
+  }
+}

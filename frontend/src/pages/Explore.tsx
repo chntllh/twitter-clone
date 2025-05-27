@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import LabelledSelectorTabs from "../components/ui/LabelledSelectorTabs";
 import { useLocation, useNavigate } from "react-router-dom";
-import ScrollTest from "../components/ui/ScrollTest";
+// import ScrollTest from "../components/ui/ScrollTest";
 import { getHashtagTweets } from "../api/api";
 import Posts from "../components/ui/Post/Posts";
 
@@ -100,15 +100,13 @@ const Explore = () => {
       <div className="sticky top-0 pt-2 z-10 backdrop-blur-lg bg-black bg-opacity-30">
         <div className="flex justify-center mb-2">
           <div
-            className={`flex relative w-[90%] h-12 overflow-hidden rounded-full border border-gray-600 ${
-              isFocused && "ring-2 ring-blue-500"
-            }`}
+            className={`flex relative w-[90%] h-12 overflow-hidden rounded-full border border-gray-600 ${isFocused && "ring-2 ring-blue-500"
+              }`}
           >
             <div
               onClick={handleSearch}
-              className={`absolute py-2 px-4 z-10 rounded-full hover:bg-gray-300 hover:bg-opacity-30 hover:cursor-pointer ${
-                isFocused && "text-blue-500"
-              }`}
+              className={`absolute py-2 px-4 z-10 rounded-full hover:bg-gray-300 hover:bg-opacity-30 hover:cursor-pointer ${isFocused && "text-blue-500"
+                }`}
             >
               <BiSearch size={30} />
             </div>
@@ -147,7 +145,7 @@ const Explore = () => {
         )}
       </div>
 
-      {location.pathname === "/explore" && <ScrollTest />}
+      {/* {location.pathname === "/explore" && <ScrollTest />} */}
 
       {location.pathname === "/search" &&
         (searchPosts.length > 0 ? (

@@ -10,6 +10,8 @@ const logErrorAndExit = (message: string) => {
   process.exit(1);
 };
 
+const port = process.env.PORT || 4000;
+
 dotenv.config({
   path: process.env.NODE_ENV === "test" ? "../.env.test" : "../.env",
 });
@@ -46,8 +48,8 @@ app.use(
   })
 );
 
-app.listen(3000, () =>
-  console.log("\x1b[33m%s\x1b[0m", "Server running on port 3000")
+app.listen(port, () =>
+  console.log("\x1b[33m%s\x1b[0m", `Server running on port ${port}`)
 );
 
 // Routes

@@ -131,7 +131,8 @@ export const updateUser = async (
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
+        secure: true,
         maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);

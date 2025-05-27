@@ -69,7 +69,8 @@ export const register = async (
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
+        secure: true,
         maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);
@@ -172,7 +173,8 @@ export const login = async (
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
+        secure: true,
         maxAge: 14 * 24 * 60 * 60 * 1000,
       })
       .json(userData);
@@ -243,7 +245,8 @@ export const google = async (
         .status(200)
         .cookie("access_token", token, {
           httpOnly: true,
-          sameSite: "strict",
+          sameSite: "none",
+          secure: true,
           maxAge: 14 * 24 * 60 * 60 * 1000,
         })
         .json(userData);
@@ -277,7 +280,8 @@ export const google = async (
         .status(200)
         .cookie("access_token", token, {
           httpOnly: true,
-          sameSite: "strict",
+          sameSite: "none",
+          secure: true,
           maxAge: 14 * 24 * 60 * 60 * 1000,
         })
         .json(userData);

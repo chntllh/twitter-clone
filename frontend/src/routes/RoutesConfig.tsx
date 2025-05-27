@@ -8,13 +8,12 @@ import LoadingSpinner from "../components/ui/LoadingSpinner";
 
 import Layout from "../layout/Layout";
 import FollowInfo from "../components/ui/Profile/FollowInfo";
-
-const Home = lazy(() => import("../pages/Home"));
-const Explore = lazy(() => import("../pages/Explore"));
-const Notifications = lazy(() => import("../pages/Notifications"));
-const Profile = lazy(() => import("../pages/Profile"));
-const Settings = lazy(() => import("../pages/Settings"));
-const SignIn = lazy(() => import("../pages/SignIn"));
+import Home from "../pages/Home";
+import Explore from "../pages/Explore";
+import Notifications from "../pages/Notifications";
+import Profile from "../pages/Profile";
+import Settings from "../pages/Settings";
+import SignIn from "../pages/SignIn";
 
 const router = createBrowserRouter([
   {

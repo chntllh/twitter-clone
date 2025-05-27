@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: "https://twitter-clone-backend-7wbw.onrender.com",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

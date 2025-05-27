@@ -13,8 +13,8 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        target: "http://localhost:3000",
-        secure: false,
+        target: "https://twitter-clone-backend-7wbw.onrender.com",
+        secure: true,
       },
     },
   },
